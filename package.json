@@ -1,0 +1,25 @@
+{
+  "name": "real-money-magic-root",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "install-client": "cd client && npm install || echo 'No package.json in client'",
+    "install-server-pip": "cd server && pip install -r install.txt || echo 'No install.txt in server'",
+    "install": "npm run install-client && npm run install-server-pip",
+
+    "build-client": "cd client && npm run build",
+    "build": "npm run build-client",
+
+    "start-client": "cd client && npm run dev",
+    "start-server": "uvicorn app.main:app --reload --app-dir ./server",
+    "dev": "concurrently \"npm run start-client\" \"npm run start-server\"",
+
+    "test-client": "npm --prefix client run test",
+    "test-server": "pytest server/tests",
+    "test": "concurrently \"npm run test-client\" \"npm run test-server\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
