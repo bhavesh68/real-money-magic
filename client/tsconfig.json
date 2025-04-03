@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 {
   "compilerOptions": {
@@ -14,4 +15,12 @@
     "types": ["vitest", "vite/client"]
   },
   "include": ["src"]
+=======
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+>>>>>>> 222288942d6245d8aaf5606a836373f4af7a6370
 }
