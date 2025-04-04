@@ -14,7 +14,7 @@ def test_hello_query():
     """
     response = client.post("/graphql", json={"query": "{ hello }"})
     assert response.status_code == 200
-    assert response.json()["data"]["hello"] == "Hello from FastAPI + GraphQL!"
+    assert response.json()["data"]["hello"] == "Hello from the backend! FastAPI + GraphQL!"
 
 def test_dummy():
     """
@@ -29,3 +29,7 @@ def test_rest_hello():
     response = client.get("/hello")
     assert response.status_code == 200
     assert "message" in response.json()
+
+def test_math_still_works():
+    assert 3 * 3 == 9
+

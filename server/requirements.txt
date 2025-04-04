@@ -6,17 +6,15 @@ uvicorn==0.34.0
 starlette==0.46.1
 
 # --- GraphQL ---
-ariadne                  
-graphql-core==3.2.6
 strawberry-graphql==0.263.0
 
 # --- MongoDB + ODM ---
 motor                    
-beanie                   
+beanie==1.18.0                   
 pymongo==4.11.3          
 
 # --- Pydantic + Types ---
-pydantic[email]==2.11.1
+pydantic[email]==1.10.12
 pydantic_core==2.33.0
 annotated-types==0.7.0
 typing-inspection==0.4.0
@@ -26,7 +24,8 @@ typing_extensions==4.13.0
 fastapi-jwt-auth
 pyjwt[crypto]            
 cryptography             
-passlib[bcrypt]          
+passlib[bcrypt]==1.7.4
+bcrypt==3.2.0         
 cffi                     
 python-dotenv==1.1.0
 

@@ -1,0 +1,18 @@
+# Python virtual environments
+venv/
+
+# Environment files
+.env
+.env.*
+
+# __pycache__ files (Python bytecode)
+__pycache__/
+
+# Log files
+logs/
+*.log
+
+# Docker volumes and artifacts
+*.pid
+*.sock
+docker-compose.override.yml
