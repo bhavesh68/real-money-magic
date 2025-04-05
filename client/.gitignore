@@ -22,9 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
+=======
 
 
 # Environments
 .env.development
 .env.production
 .env
+>>>>>>>>> Temporary merge branch 2
