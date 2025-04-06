@@ -62,7 +62,7 @@ const Signup = () => {
         {/* ✨ Sparkle Magic Line */}
         <p className="text-center text-base text-[#1D7E5F] font-semibold mt-2 mb-6 leading-relaxed">
         <span className="text-xl text-yellow-400 drop-shadow-md animate-pulse">✨</span>{' '}
-        Transform your relationship with money<br />and transform your life{' '}
+         Transform your relationship with money<br />and transform your life{' '}
         <span className="text-xl text-yellow-400 drop-shadow-md animate-pulse">✨</span>
         </p>
 
@@ -70,7 +70,7 @@ const Signup = () => {
           <input
             type="text"
             name="name"
-            placeholder="Full Name"
+            placeholder="Name"
             className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
             value={formData.name}
             onChange={handleChange}
