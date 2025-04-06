@@ -42,7 +42,8 @@ async def test_register_user(async_client):
     
     log_test("test_register_user", f"🔵 Register Response: {response_json}", Fore.GREEN)
 
-    result = response_json["data"]["register"]
+    result = response_json.get("data", {}).get("register")
+    assert result is not None, "Register mutation returned no data"
     if result:
         log_test("test_register_user", "[✅ TEST] New user registered successfully.")
     else:
