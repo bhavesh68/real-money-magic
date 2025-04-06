@@ -5,6 +5,7 @@ import Login from './components/login';
 import Signup from './screens/Signup';
 import Dashboard from './screens/Dashboard';
 import Hello from './screens/Hello';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -17,13 +18,55 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/hello" element={<Hello />} />
 
-      {/* Main app pages (now standalone) */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/transactions" element={<div>Transactions Page</div>} />
-      <Route path="/day" element={<div>Day View</div>} />
-      <Route path="/week" element={<div>Week View</div>} />
-      <Route path="/month" element={<div>Month View</div>} />
-      <Route path="/profile" element={<div>Profile Page</div>} />
+      {/* Protected pages */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/transactions"
+        element={
+          <ProtectedRoute>
+            <div>Transactions Page</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/day"
+        element={
+          <ProtectedRoute>
+            <div>Day View</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/week"
+        element={
+          <ProtectedRoute>
+            <div>Week View</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/month"
+        element={
+          <ProtectedRoute>
+            <div>Month View</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <div>Profile Page</div>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

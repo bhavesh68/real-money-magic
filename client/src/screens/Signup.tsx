@@ -1,21 +1,50 @@
-// src/screens/Signup.tsx
-import { useState } from 'react';
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { REGISTER_USER } from "../graphql/mutations";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
+
+  const [registerUser] = useMutation(REGISTER_USER);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signing up with:', formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const { data } = await registerUser({
+        variables: {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        },
+      });
+
+      if (data.register) {
+        // ✅ Registration succeeded
+        navigate("/login");
+      } else {
+        alert("A user with that email already exists.");
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      alert("Something went wrong during signup.");
+    }
   };
 
   return (

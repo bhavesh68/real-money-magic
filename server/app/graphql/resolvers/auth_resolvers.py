@@ -23,11 +23,16 @@ class AuthResponse:
 class AuthMutation:
     @strawberry.field
     async def register(
-        self, email: str, password: str, first_name: str, last_name: str
+        self, email: str, password: str, name: str
     ) -> bool:
         existing = await User.find_one({"email": email})
         if existing:
             return False
+        
+        name_parts = name.strip().split(" ", 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ""
+
         user = User(
             email=email,
             hashed_password=hash_password(password),

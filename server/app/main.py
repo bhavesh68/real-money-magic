@@ -56,3 +56,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from app.routes.quotes import router as quote_router
+app.include_router(quote_router, prefix="/api")
+
