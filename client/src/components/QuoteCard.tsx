@@ -20,7 +20,7 @@ const QuoteCard = () => {
   
     fetchQuote();
   
-    const interval = setInterval(fetchQuote, 30000); 
+    const interval = setInterval(fetchQuote, 90000); 
     return () => clearInterval(interval); 
   }, []); 
 
