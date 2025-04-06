@@ -18,15 +18,8 @@ const defaultEntry: Entry = {
 };
 
 const categories = [
-  'food',
-  'dining out',
-  'gas',
-  'rent',
-  'utilities',
-  'clothes',
-  'recreation',
-  'repair',
-  'other',
+  'food', 'dining out', 'gas', 'rent', 'utilities',
+  'clothes', 'recreation', 'repair', 'other',
 ];
 
 const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: string }) => {
@@ -56,7 +49,7 @@ const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: strin
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submitting entries:', entries);
-    // Later: send to backend
+    // TODO: Connect to backend when ready
   };
 
   return (
@@ -65,7 +58,7 @@ const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: strin
         ✨ Daily Entry for {date}
       </h2>
 
-      {/* ✅ Today Summary above form */}
+      {/* 🪷 Summary Card */}
       {entries.length > 0 && (
         <TodaySummary
           totalExpenses={totalExpenses}
@@ -77,7 +70,7 @@ const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: strin
       <form onSubmit={handleSubmit} className="space-y-4">
         {entries.map((entry, i) => (
           <div key={i} className="bg-white border rounded-xl p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center justify-between gap-4">
               <select
                 value={entry.type}
                 onChange={(e) => handleChange(i, 'type', e.target.value)}
@@ -101,7 +94,7 @@ const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: strin
                 onChange={(e) => handleChange(i, 'category', e.target.value)}
                 className="border p-2 rounded-lg"
               >
-                <option value="">Category</option>
+                <option value="">Select Category</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
@@ -126,11 +119,6 @@ const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: strin
             </label>
           </div>
         ))}
-
-        <div className="flex justify-between text-sm font-medium text-gray-700">
-          <p>💸 Total Expenses: <span className="text-[#A72608]">${totalExpenses.toFixed(2)}</span></p>
-          <p>💰 Total Income: <span className="text-[#1D7E5F]">${totalIncome.toFixed(2)}</span></p>
-        </div>
 
         <button
           type="button"

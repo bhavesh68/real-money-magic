@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 🌟 Sparkle Animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+.twinkle {
+  animation: twinkle 1s ease-in-out infinite;
+}
+
+/* 🌿 Tailwind Styling for FullCalendar v6 */
+.fc {
+  @apply text-sm;
+}
+
+.fc .fc-toolbar-title {
+  @apply text-2xl font-bold text-[#1D7E5F];
+}
+
+.fc-button {
+  @apply bg-[#29AB87] text-white px-3 py-1 rounded-lg hover:bg-[#218F71] transition;
+}
+
+.fc-button-primary:not(:disabled):hover {
+  @apply bg-[#1D7E5F];
+}
+
+.fc-daygrid-day {
+  @apply border border-gray-200 bg-white;
+}
+
+.fc-day-today {
+  @apply bg-[#fef9c3]; /* light soft yellow */
+}
+
+.fc-event {
+  @apply bg-[#1D7E5F] text-white rounded px-2 py-1 text-xs;
+}
+
