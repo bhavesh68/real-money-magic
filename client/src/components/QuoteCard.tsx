@@ -5,17 +5,24 @@ const QuoteCard = () => {
   const [author, setAuthor] = useState('');
 
   useEffect(() => {
-    fetch('https://zenquotes.io/api/random')
-      .then(res => res.json())
-      .then(data => {
-        setQuote(data[0].q);
-        setAuthor(data[0].a);
-      })
-      .catch(err => {
-        setQuote('You are the source of your own abundance. ✨');
-        setAuthor('Real Money Magic');
-      });
-  }, []);
+    const fetchQuote = () => {
+      fetch('http://localhost:8000/api/quote')
+        .then(res => res.json())
+        .then(data => {
+          setQuote(data.quote);
+          setAuthor(data.author);
+        })
+        .catch(err => {
+          setQuote('You are the source of your own abundance. ✨');
+          setAuthor('Real Money Magic');
+        });
+    };
+  
+    fetchQuote();
+  
+    const interval = setInterval(fetchQuote, 30000); 
+    return () => clearInterval(interval); 
+  }, []); 
 
   return (
     <div className="bg-white/80 rounded-xl shadow-lg p-6 max-w-xl mx-auto text-center relative backdrop-blur-sm border border-yellow-200">
