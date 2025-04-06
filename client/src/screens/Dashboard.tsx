@@ -1,5 +1,7 @@
 // src/screens/Dashboard.tsx
+import FullCalendar from '@fullcalendar/react';
 import QuoteCard from '../components/QuoteCard';
+import Calendar from '../components/calendar';
 
 const Dashboard = () => {
   return (
@@ -18,6 +20,7 @@ const Dashboard = () => {
 
         {/* Inspirational quote */}
         <QuoteCard />
+        <Calendar />
 
         {/* Add more components here */}
         <p className="text-sm text-gray-500 mt-6">🌿 Abundance flows with clarity and awareness.</p>
