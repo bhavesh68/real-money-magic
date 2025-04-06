@@ -1,19 +1,43 @@
-// src/components/Login.tsx
 import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { LOGIN_USER } from '../graphql/mutations';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    usernameOrEmail: '',
+    email: '',
     password: '',
   });
+
+  const [loginUser] = useMutation(LOGIN_USER);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Logging in with:', formData);
+
+    try {
+      const { data } = await loginUser({
+        variables: {
+          email: formData.email,
+          password: formData.password,
+        },
+      });
+
+      if (data?.login?.accessToken) {
+        localStorage.setItem('token', data.login.accessToken);
+        localStorage.setItem('refresh_token', data.login.refreshToken);
+        navigate('/dashboard');
+      } else {
+        alert('Invalid login');
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+      alert('Login failed. Please try again.');
+    }
   };
 
   return (
@@ -33,10 +57,10 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
-            name="Email"
+            name="email"
             placeholder="Email"
             className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
-            value={formData.usernameOrEmail}
+            value={formData.email}
             onChange={handleChange}
           />
           <input
