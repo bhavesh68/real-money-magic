@@ -9,7 +9,7 @@ def log_test(name: str, message: str, color: str = Fore.WHITE):
 # Shared GraphQL queries
 REGISTER_QUERY = """
 mutation {
-    register(email: "testcase@example.com", password: "test1234", firstName: "Test", lastName: "User")
+    register(email: "testcase@example.com", password: "test1234", name: "Test User")
 }
 """
 
