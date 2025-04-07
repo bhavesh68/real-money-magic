@@ -2,6 +2,7 @@ import strawberry
 from typing import List
 from strawberry.types import Info
 from beanie import PydanticObjectId
+from beanie.operators import In
 from app.models.project import Project
 from app.models.user import User
 from app.auth.auth import get_current_user_gql 
@@ -33,7 +34,7 @@ class ProjectQuery:
     @strawberry.field
     async def my_projects(self, info: Info) -> List[ProjectType]:
         user: User = await get_current_user_gql(info)
-        projects = await Project.find(Project.id.in_(user.projects)).to_list()
+        projects = await Project.find(In(Project.id, user.projects)).to_list()
         return [ProjectType(**p.dict()) for p in projects]
 
 @strawberry.type
@@ -41,6 +42,10 @@ class ProjectMutation:
     @strawberry.mutation
     async def create_project(self, info: Info, title: str, notes: str = "") -> ProjectType:
         user: User = await get_current_user_gql(info)
+
+        if len(user.projects) >= 3:
+            raise Exception("You have reached the maximum of 3 projects.")
+
         project = Project(title=title, notes=notes)
         await project.insert()
         user.projects.append(project.id)
