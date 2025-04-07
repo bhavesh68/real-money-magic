@@ -40,7 +40,11 @@ const Input = ({ onAddEntry }: InputProps) => {
     >
       {/* Type & Amount */}
       <div className="flex flex-col md:flex-row gap-3">
+      {/* Type */}
+      <div className="flex flex-col w-full">
+        <label htmlFor="entry-type" className="text-sm font-semibold text-[#1D7E5F]">Type</label>
         <select
+          id="entry-type"
           value={type}
           onChange={(e) => setType(e.target.value as 'expense' | 'income')}
           className="border border-[#1D7E5F] rounded-md px-3 py-2 text-sm text-[#1D7E5F] w-full"
@@ -48,8 +52,13 @@ const Input = ({ onAddEntry }: InputProps) => {
           <option value="expense">Expense</option>
           <option value="income">Income</option>
         </select>
+      </div>
 
+      {/* Amount */}
+      <div className="flex flex-col w-full">
+        <label htmlFor="entry-amount" className="text-sm font-semibold text-[#1D7E5F]">Amount</label>
         <input
+          id="entry-amount"
           type="number"
           step="0.01"
           placeholder="Amount"
@@ -58,11 +67,13 @@ const Input = ({ onAddEntry }: InputProps) => {
           className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
         />
       </div>
+    </div>
 
       {/* Category */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-[#1D7E5F]">Category</label>
+        <label htmlFor="type" className="text-sm font-semibold text-[#1D7E5F]">Category</label>
         <select
+          id="type"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm"

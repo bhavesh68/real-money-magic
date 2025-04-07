@@ -89,7 +89,8 @@ npm run dev
 
 Backend `.env`:
 ```env
-MONGO_URL=mongodb+srv://<user>:<pass>@cluster.mongodb.net/realmoneydb
+MONGO_URL=mongodb+srv://<db_username>:<db_password>@rmm-db.wkyhujn.mongodb.net/realmoneydb?retryWrites=true&w=majority&appName=RMM-DB
+
 JWT_SECRET=your_generated_jwt_secret
 ```
 

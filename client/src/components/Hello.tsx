@@ -1,4 +1,5 @@
 // src/screens/Hello.tsx
+// This file is no longer in use and was for testing purposes.
 
 import { gql, useQuery } from '@apollo/client';
 
