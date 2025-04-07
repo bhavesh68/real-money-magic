@@ -2,16 +2,21 @@
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 
-import { Routes, Route, Navigate, Router } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import Login from "./components/login";
-import Signup from "./screens/Signup";
+import Signup from "./components/Signup";
 import Dashboard from "./screens/Dashboard";
-import Hello from "./screens/Hello";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/NavBar";
-import LayoutWithNavbar from './components/LayoutWithNavbar';
+import Hello from "./components/Hello";
+import LayoutWithNavbar from './components/LayoutWithNavbar'; // This is where the NavBar is linked to
+import { isLoggedInVar } from "./graphql/cache";
 
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    isLoggedInVar(!!token);
+  }, []);
+
   return (
       <Routes>
         {/* Default route redirects to login */}

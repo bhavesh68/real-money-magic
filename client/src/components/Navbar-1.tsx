@@ -1,3 +1,5 @@
+// This was only a mock navbar till the actual final one was created
+
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {

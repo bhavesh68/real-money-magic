@@ -1,6 +1,5 @@
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useState } from "react";
-import { GET_USER_PROFILE } from "../graphql/queries";
 
 const GET_USER_PROFILE = gql`
   query GetUserProfile {
@@ -103,6 +102,8 @@ const Profile: React.FC = () => {
           <div>
             <label className="block text-sm font-medium">Name</label>
             <input
+              name="name"
+              placeholder="Enter your name"
               className="w-full border p-2 rounded"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -113,6 +114,8 @@ const Profile: React.FC = () => {
           <div>
             <label className="block text-sm font-medium">Email</label>
             <input
+              name="email"
+              placeholder="Enter your email"
               type="email"
               className="w-full border p-2 rounded"
               value={email}
@@ -141,6 +144,8 @@ const Profile: React.FC = () => {
               Current Password
             </label>
             <input
+              name="currentPassword"
+              placeholder="Current password"
               type="password"
               className="w-full border p-2 rounded"
               value={currentPassword}
@@ -152,6 +157,8 @@ const Profile: React.FC = () => {
           <div>
             <label className="block text-sm font-medium">New Password</label>
             <input
+              name="newPassword"
+              placeholder="New Password"
               type="password"
               className="w-full border p-2 rounded"
               value={newPassword}
@@ -165,6 +172,8 @@ const Profile: React.FC = () => {
               Confirm New Password
             </label>
             <input
+              name="confirmPassword"
+              placeholder="Confirm New Password"
               type="password"
               className="w-full border p-2 rounded"
               value={confirmPassword}

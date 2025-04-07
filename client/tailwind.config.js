@@ -3,7 +3,11 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'money-bg': "url('/assets/MoneyMagicBG.png')",
+      },
+    },
   },
   plugins: [],
-}
+};
