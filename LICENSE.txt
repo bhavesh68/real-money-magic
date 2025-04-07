@@ -1,0 +1,25 @@
+Copyright (c) 2025 Real Money Magic Team
+
+All rights reserved.
+
+This software and associated files (the "Software") are the property of the Real Money Magic project team.
+
+Permission to use, copy, modify, merge, publish, distribute, sublicense, or sell copies of the Software is **strictly prohibited** to anyone outside the following authorized contributors:
+
+- Alex | https://github.com/Amarrero0215
+- Jen | https://github.com/JT-code-dev
+- Bhavesh | https://github.com/bhavesh68
+- Louis | https://github.com/Learnando
+- Edison | https://github.com/gnanasekaran-sakthivel
+- Pral | https://github.com/argadeps
+
+Unauthorized use of any part of this codebase is prohibited.
+
+The Software is provided "as is", without warranty of any kind, express or implied. The Real Money Magic project team is not liable for any damages resulting from the use or misuse of this software.
+
+To request permission for collaboration or usage outside the team, please contact the original repository owner through the GitHub issues tab or team contact email.
+
+---
+
+**Summary:** You are not allowed to copy, redistribute, or modify this software unless you are one of the contributors listed above.
+
