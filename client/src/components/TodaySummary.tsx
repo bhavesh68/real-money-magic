@@ -1,142 +1,95 @@
-import { useState } from 'react';
-import TodaySummary from './TodaySummary';
+import React, { useState } from 'react';
+import dayjs from 'dayjs';
+import type { Entry } from '../types/entries'
 
-type Entry = {
-  type: 'expense' | 'income';
-  amount: number;
-  category: string;
-  note?: string;
-  recurring: boolean;
-};
 
-const defaultEntry: Entry = {
-  type: 'expense',
-  amount: 0,
-  category: '',
-  note: '',
-  recurring: false,
-};
+interface TodaySummaryProps {
+  totalExpenses: number;
+  totalIncome: number;
+  entries: Entry[];
+  date: string;
+}
 
-const categories = [
-  'food', 'dining out', 'gas', 'rent', 'utilities',
-  'clothes', 'recreation', 'repair', 'other',
-];
+const TodaySummary = ({ totalExpenses, totalIncome, entries, date }: TodaySummaryProps) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
-const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: string }) => {
-  const [entries, setEntries] = useState<Entry[]>([{ ...defaultEntry }]);
+  const expenseBreakdown: Record<string, number> = {};
+  const incomeBreakdown: Record<string, number> = {};
+  const categorizedExpenses: Record<string, Entry[]> = {};
 
-  const handleChange = (index: number, field: keyof Entry, value: any) => {
-    const newEntries = [...entries];
-    newEntries[index] = {
-      ...newEntries[index],
-      [field]: field === 'amount' ? parseFloat(value) : value,
-    };
-    setEntries(newEntries);
-  };
+  entries.forEach((entry) => {
+    if (entry.type === 'expense') {
+      expenseBreakdown[entry.category] = (expenseBreakdown[entry.category] || 0) + entry.amount;
+      categorizedExpenses[entry.category] = categorizedExpenses[entry.category] || [];
+      categorizedExpenses[entry.category].push(entry);
+    } else if (entry.type === 'income') {
+      const source = entry.note || 'Uncategorized';
+      incomeBreakdown[source] = (incomeBreakdown[source] || 0) + entry.amount;
+    }
+  });
 
-  const addEntry = () => {
-    setEntries([...entries, { ...defaultEntry }]);
-  };
-
-  const totalExpenses = entries
-    .filter((e) => e.type === 'expense')
-    .reduce((sum, e) => sum + (e.amount || 0), 0);
-
-  const totalIncome = entries
-    .filter((e) => e.type === 'income')
-    .reduce((sum, e) => sum + (e.amount || 0), 0);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Submitting entries:', entries);
-    // TODO: Connect to backend when ready
+  const toggleCategory = (cat: string) => {
+    setExpandedCategories((prev) => ({ ...prev, [cat]: !prev[cat] }));
   };
 
   return (
-    <div className="bg-white/80 p-6 rounded-xl shadow-xl max-w-xl w-full mx-auto">
-      <h2 className="text-2xl font-bold text-[#1D7E5F] mb-4 text-center">
-        ✨ Daily Entry for {date}
+    <div className="bg-white border border-[#1D7E5F] rounded-2xl p-6 shadow-xl w-full max-w-xl mx-auto mt-6">
+      <h2 className="text-2xl font-bold text-center text-[#1D7E5F] mb-4">
+        📅 {dayjs(date).format('MMMM D, YYYY')}
       </h2>
 
-      {/* 🪷 Summary Card */}
-      {entries.length > 0 && (
-        <TodaySummary
-          totalExpenses={totalExpenses}
-          totalIncome={totalIncome}
-          date={date}
-        />
-      )}
+      <h3 className="text-lg font-bold text-[#1D7E5F] mb-2">✨ Today’s Summary</h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {entries.map((entry, i) => (
-          <div key={i} className="bg-white border rounded-xl p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between gap-4">
-              <select
-                value={entry.type}
-                onChange={(e) => handleChange(i, 'type', e.target.value)}
-                className="border p-2 rounded-lg"
-              >
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
+      <div className="space-y-2">
+        <p className="text-[#1D7E5F] font-semibold">💸 Total Expenses: ${totalExpenses.toFixed(2)}</p>
+        <p className="text-[#1D7E5F] font-semibold">💰 Total Income: ${totalIncome.toFixed(2)}</p>
 
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Amount"
-                value={entry.amount}
-                onChange={(e) => handleChange(i, 'amount', e.target.value)}
-                className="w-32 p-2 border rounded-lg"
-              />
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="text-sm text-[#29AB87] hover:underline mt-2"
+        >
+          {showDetails ? 'Hide Breakdown ▲' : 'Show Breakdown ▼'}
+        </button>
 
-              <select
-                value={entry.category}
-                onChange={(e) => handleChange(i, 'category', e.target.value)}
-                className="border p-2 rounded-lg"
-              >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+        {showDetails && (
+          <div className="mt-2">
+            <div className="mb-3">
+              <p className="font-bold text-[#155D47] mb-1">Expenses by Category:</p>
+              <ul className="text-sm text-[#1D7E5F]">
+                {Object.entries(expenseBreakdown).map(([cat, amount]) => (
+                  <li key={cat} className="mb-2">
+                    <button
+                      className="text-left w-full font-semibold hover:underline"
+                      onClick={() => toggleCategory(cat)}
+                    >
+                      {expandedCategories[cat] ? '▼' : '▶'} {cat}: ${amount.toFixed(2)}
+                    </button>
+                    {expandedCategories[cat] && (
+                      <ul className="ml-4 list-disc">
+                        {categorizedExpenses[cat].map((entry, idx) => (
+                          <li key={idx}>${entry.amount.toFixed(2)} {entry.note && `- ${entry.note}`}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
                 ))}
-              </select>
+              </ul>
             </div>
 
-            <input
-              type="text"
-              placeholder={entry.type === 'income' ? 'Source (optional)' : 'Note (optional)'}
-              value={entry.note}
-              onChange={(e) => handleChange(i, 'note', e.target.value)}
-              className="w-full p-2 border rounded-lg"
-            />
-
-            <label className="flex items-center space-x-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={entry.recurring}
-                onChange={(e) => handleChange(i, 'recurring', e.target.checked)}
-              />
-              <span>Recurring monthly</span>
-            </label>
+            <div>
+              <p className="font-bold text-[#155D47] mb-1">Income by Source:</p>
+              <ul className="list-disc list-inside text-sm text-[#1D7E5F]">
+                {Object.entries(incomeBreakdown).map(([source, amount]) => (
+                  <li key={source}>{source}: ${amount.toFixed(2)}</li>
+                ))}
+              </ul>
+            </div>
           </div>
-        ))}
-
-        <button
-          type="button"
-          onClick={addEntry}
-          className="w-full bg-[#29AB87] text-white py-2 rounded-xl hover:bg-[#218F71] transition"
-        >
-          ＋ Add Another Entry
-        </button>
-
-        <button
-          type="submit"
-          className="w-full mt-2 bg-[#1D7E5F] text-white py-2 rounded-xl hover:bg-[#155D47] transition"
-        >
-          Save Entries
-        </button>
-      </form>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Input;
+export default TodaySummary;

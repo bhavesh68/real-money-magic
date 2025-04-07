@@ -1,141 +1,95 @@
-import { useRef, useState } from 'react';
+// calendar.tsx
+// calendar.tsx
+import React, { useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import type { CalendarOptions } from '@fullcalendar/core';
-import Input from './Input';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import dayjs from 'dayjs';
+import TodaySummary from './TodaySummary';
+import type { Entry } from '../types/entries';
 
-type Entry = {
-  type: 'expense' | 'income';
-  amount: number;
-  category: string;
-  note?: string;
-  recurring: boolean;
-};
+interface CalendarProps {
+  selectedDate: string;
+  onDateChange: (date: string) => void;
+  entries: Entry[];
+}
 
-const Calendar = () => {
-  const calendarRef = useRef<FullCalendar | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [dailyEntries, setDailyEntries] = useState<Record<string, Entry[]>>({});
-  const [sparkleDate, setSparkleDate] = useState<string | null>(null);
+const Calendar = ({ selectedDate, onDateChange, entries }: CalendarProps) => {
+  const fullCalendarRef = useRef<FullCalendar | null>(null);
+  const [currentView, setCurrentView] = React.useState<'dayGridDay' | 'dayGridWeek' | 'dayGridMonth'>('dayGridDay');
 
-  const today = new Date().toISOString().split('T')[0];
+  useEffect(() => {
+    fullCalendarRef.current?.getApi().changeView(currentView);
+  }, [currentView]);
 
-  const handleSaveEntries = (date: string, entries: Entry[]) => {
-    setDailyEntries((prev) => ({ ...prev, [date]: entries }));
-    setSparkleDate(date); // ✨ trigger sparkle
-    setTimeout(() => setSparkleDate(null), 1200);
-  };
-
-  const handleGoToToday = () => {
-    calendarRef.current?.getApi().today();
-    setSelectedDate(today);
-  };
-
-  const handleChangeView = (view: string) => {
-    calendarRef.current?.getApi().changeView(view);
-  };
-
-  const eventList = Object.entries(dailyEntries).map(([date, entries]) => {
-    const totalExpense = entries
-      .filter((e) => e.type === 'expense')
-      .reduce((sum, e) => sum + e.amount, 0);
-    const totalIncome = entries
-      .filter((e) => e.type === 'income')
-      .reduce((sum, e) => sum + e.amount, 0);
-
-    return {
-      title: `💸 $${totalExpense.toFixed(2)} | 💰 $${totalIncome.toFixed(2)}`,
-      date,
-      className: sparkleDate === date ? 'twinkle' : '',
-    };
-  });
-
-  const calendarOptions: CalendarOptions = {
-    plugins: [dayGridPlugin, timeGridPlugin],
-    initialView: 'dayGridMonth',
-    initialDate: today,
-    headerToolbar: false,
-    height: 'auto',
-    events: eventList,
-  };
+  const entriesForSelectedDay = entries.filter((e) => e.date === selectedDate);
+  const totalExpenses = entriesForSelectedDay.filter((e) => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+  const totalIncome = entriesForSelectedDay.filter((e) => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div className="bg-white/90 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold text-[#1D7E5F] text-center mb-6">
-        📆 Real Money Magic Calendar
-      </h2>
-
-      {/* 🧾 Input form above calendar */}
-      {selectedDate && (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xl font-semibold text-[#1D7E5F] w-full text-center">
-              Add Entries for {selectedDate}
-            </h3>
-            <button
-              onClick={() => setSelectedDate(null)}
-              className="text-sm text-red-600 hover:underline"
-            >
-              ✖ Close
-            </button>
-          </div>
-          <Input date={selectedDate} onSaveEntries={handleSaveEntries} />
-        </div>
-      )}
-
-      {/* 🌿 Controls */}
-      <div className="flex justify-center gap-3 mb-4 flex-wrap">
+    <div className="bg-white border-2 border-[#29AB87] rounded-2xl p-6 shadow-xl w-full max-w-3xl">
+      {/* View buttons */}
+      <div className="flex justify-center gap-3 mb-4">
         <button
-          onClick={() => handleChangeView('dayGridMonth')}
-          className="bg-[#29AB87] text-white py-2 px-4 rounded-xl hover:bg-[#218F71] transition"
+          onClick={() => setCurrentView('dayGridMonth')}
+          className={`px-4 py-1 rounded-lg border shadow ${
+            currentView === 'dayGridMonth' ? 'bg-[#29AB87] text-white' : 'bg-white text-[#1D7E5F] border-[#29AB87]'
+          }`}
         >
-          🌞 Month
+          📅 Month
         </button>
         <button
-          onClick={() => handleChangeView('timeGridWeek')}
-          className="bg-[#29AB87] text-white py-2 px-4 rounded-xl hover:bg-[#218F71] transition"
+          onClick={() => setCurrentView('dayGridWeek')}
+          className={`px-4 py-1 rounded-lg border shadow ${
+            currentView === 'dayGridWeek' ? 'bg-[#29AB87] text-white' : 'bg-white text-[#1D7E5F] border-[#29AB87]'
+          }`}
         >
           🗓️ Week
         </button>
         <button
-          onClick={() => handleChangeView('timeGridDay')}
-          className="bg-[#29AB87] text-white py-2 px-4 rounded-xl hover:bg-[#218F71] transition"
+          onClick={() => {
+            fullCalendarRef.current?.getApi().today();
+            onDateChange(dayjs().format('YYYY-MM-DD'));
+            setCurrentView('dayGridDay');
+          }}
+          className="bg-[#29AB87] text-white px-4 py-1 rounded-lg shadow hover:bg-[#218F71]"
         >
-          📍 Day
-        </button>
-        <button
-          onClick={handleGoToToday}
-          className="bg-[#1D7E5F] text-white py-2 px-4 rounded-xl hover:bg-[#155D47] transition"
-        >
-          🔄 Today
+          📍 Today
         </button>
       </div>
 
-      {/* 📅 Calendar */}
-      <FullCalendar
-        {...calendarOptions}
-        dateClick={(info: any) => setSelectedDate(info.dateStr)}
-        ref={calendarRef}
-      />
-
-      {/* ✨ Sparkle CSS */}
-      <style>
-        {`
-          .twinkle {
-            animation: sparkleFade 1s ease-out;
-            background-color: #fef3c7 !important;
-            font-weight: bold;
-            color: #1D7E5F !important;
-          }
-
-          @keyframes sparkleFade {
-            0% { background-color: #fffde7; transform: scale(1.1); }
-            50% { background-color: #fef3c7; }
-            100% { background-color: transparent; transform: scale(1); }
-          }
-        `}
-      </style>
+      {/* Calendar view and summary */}
+      {currentView === 'dayGridDay' ? (
+        <>
+          <h2 className="text-2xl font-bold text-center text-[#1D7E5F] mb-4">
+            {dayjs(selectedDate).format('MMMM D')}
+          </h2>
+          <TodaySummary
+            date={selectedDate}
+            entries={entriesForSelectedDay}
+            totalExpenses={totalExpenses}
+            totalIncome={totalIncome}
+          />
+        </>
+      ) : (
+        <FullCalendar
+          ref={fullCalendarRef}
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView={currentView}
+          initialDate={selectedDate}
+          headerToolbar={false}
+          height="auto"
+          dateClick={(info: DateClickArg) => {
+            onDateChange(info.dateStr);
+            setCurrentView('dayGridDay');
+          }}
+          events={entries.map((entry) => ({
+            title: `${entry.type === 'income' ? '+' : '-'}$${entry.amount}`,
+            date: entry.date,
+            color: entry.type === 'income' ? '#29AB87' : '#A7C4B5',
+          }))}
+        />
+      )}
     </div>
   );
 };

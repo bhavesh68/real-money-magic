@@ -1,37 +1,69 @@
-// src/screens/Dashboard.tsx
-import FullCalendar from '@fullcalendar/react';
+// Dashboard.tsx
+import React, { useState } from 'react';
+import dayjs from 'dayjs';
 import QuoteCard from '../components/QuoteCard';
 import Calendar from '../components/calendar';
+import Input from '../components/Input';
+import type { Entry } from '../types/entries';
 
 const Dashboard = () => {
+  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [showInput, setShowInput] = useState(false);
+
+  const handleAddEntry = (entry: Entry) => {
+    setEntries((prev) => {
+      const newEntries = [...prev, { ...entry, date: selectedDate }];
+      if (entry.recurring) {
+        for (let i = 1; i < 12; i++) {
+          const futureDate = dayjs(selectedDate).add(i, 'month').format('YYYY-MM-DD');
+          newEntries.push({ ...entry, date: futureDate });
+        }
+      }
+      return newEntries;
+    });
+  };
+
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative flex items-center justify-center px-4"
+      className="min-h-screen bg-cover bg-center relative flex flex-col items-center px-4 py-6"
       style={{ backgroundImage: "url('/assets/MoneyMagicBG.png')" }}
     >
-      {/* Soft overlay to blur and tint the background */}
+      {/* Background Blur Layer */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
 
-      {/* Central container for dashboard content */}
-      <div className="relative z-10 bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-8 w-full max-w-3xl text-center space-y-6">
-        <h1 className="text-3xl font-bold text-[#1D7E5F]">
-          Welcome to Your Real Money Magic Dashboard 🌞
-        </h1>
+      {/* Content Layer */}
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-[#1D7E5F] mb-4">Today At A Glance</h1>
 
-        {/* Inspirational quote */}
+        {/* Inspirational Quote */}
         <QuoteCard />
-        <Calendar />
 
-        {/* Add more components here */}
-        <p className="text-sm text-gray-500 mt-6">🌿 Abundance flows with clarity and awareness.</p>
+        {/* Add Entry Button */}
+        <button
+          onClick={() => setShowInput((prev) => !prev)}
+          className="mt-6 mb-4 bg-[#29AB87] text-white text-lg font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-[#218F71] transition-all"
+        >
+          {showInput ? 'Close Entry Form ✖' : '+ Add Entry'}
+        </button>
+
+        {/* Input Form */}
+        {showInput && (
+          <div className="w-full max-w-3xl">
+            <Input onAddEntry={handleAddEntry} />
+          </div>
+        )}
+
+        {/* Calendar Component */}
+        <Calendar
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          entries={entries}
+        />
       </div>
     </div>
   );
 };
 
 export default Dashboard;
-
-
-
-
-  
