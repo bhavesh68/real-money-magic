@@ -1,154 +1,114 @@
-import { useState } from 'react';
-import TodaySummary from './TodaySummary';
+// Input.tsx
+import React, { useState } from 'react';
+import type { Entry } from '../types/entries';
 
-type Entry = {
-  type: 'expense' | 'income';
-  amount: number;
-  category: string;
-  note?: string;
-  recurring: boolean;
-};
+interface InputProps {
+  onAddEntry?: (entry: Entry) => void;
+}
 
-const defaultEntry: Entry = {
-  type: 'expense',
-  amount: 0,
-  category: '',
-  note: '',
-  recurring: false,
-};
-
-const categories = [
-  'food',
-  'dining out',
-  'gas',
-  'rent',
-  'utilities',
-  'clothes',
-  'recreation',
-  'repair',
-  'other',
-];
-
-const Input = ({ date = new Date().toISOString().split('T')[0] }: { date?: string }) => {
-  const [entries, setEntries] = useState<Entry[]>([{ ...defaultEntry }]);
-
-  const handleChange = (index: number, field: keyof Entry, value: any) => {
-    const newEntries = [...entries];
-    newEntries[index] = {
-      ...newEntries[index],
-      [field]: field === 'amount' ? parseFloat(value) : value,
-    };
-    setEntries(newEntries);
-  };
-
-  const addEntry = () => {
-    setEntries([...entries, { ...defaultEntry }]);
-  };
-
-  const totalExpenses = entries
-    .filter((e) => e.type === 'expense')
-    .reduce((sum, e) => sum + (e.amount || 0), 0);
-
-  const totalIncome = entries
-    .filter((e) => e.type === 'income')
-    .reduce((sum, e) => sum + (e.amount || 0), 0);
+const Input = ({ onAddEntry }: InputProps) => {
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState<'expense' | 'income'>('expense');
+  const [category, setCategory] = useState('food');
+  const [note, setNote] = useState('');
+  const [recurring, setRecurring] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting entries:', entries);
-    // Later: send to backend
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) return;
+
+    const newEntry: Entry = {
+      type,
+      amount: numericAmount,
+      category,
+      note,
+      recurring,
+    };
+
+    onAddEntry?.(newEntry);
+
+    setAmount('');
+    setNote('');
+    setRecurring(false);
   };
 
   return (
-    <div className="bg-white/80 p-6 rounded-xl shadow-xl max-w-xl w-full mx-auto">
-      <h2 className="text-2xl font-bold text-[#1D7E5F] mb-4 text-center">
-        ✨ Daily Entry for {date}
-      </h2>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-2xl shadow-xl p-6 w-full space-y-4 border border-[#1D7E5F]"
+    >
+      {/* Type & Amount */}
+      <div className="flex flex-col md:flex-row gap-3">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as 'expense' | 'income')}
+          className="border border-[#1D7E5F] rounded-md px-3 py-2 text-sm text-[#1D7E5F] w-full"
+        >
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
 
-      {/* ✅ Today Summary above form */}
-      {entries.length > 0 && (
-        <TodaySummary
-          totalExpenses={totalExpenses}
-          totalIncome={totalIncome}
-          date={date}
+        <input
+          type="number"
+          step="0.01"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
         />
-      )}
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {entries.map((entry, i) => (
-          <div key={i} className="bg-white border rounded-xl p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <select
-                value={entry.type}
-                onChange={(e) => handleChange(i, 'type', e.target.value)}
-                className="border p-2 rounded-lg"
-              >
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
-
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Amount"
-                value={entry.amount}
-                onChange={(e) => handleChange(i, 'amount', e.target.value)}
-                className="w-32 p-2 border rounded-lg"
-              />
-
-              <select
-                value={entry.category}
-                onChange={(e) => handleChange(i, 'category', e.target.value)}
-                className="border p-2 rounded-lg"
-              >
-                <option value="">Category</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            <input
-              type="text"
-              placeholder={entry.type === 'income' ? 'Source (optional)' : 'Note (optional)'}
-              value={entry.note}
-              onChange={(e) => handleChange(i, 'note', e.target.value)}
-              className="w-full p-2 border rounded-lg"
-            />
-
-            <label className="flex items-center space-x-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={entry.recurring}
-                onChange={(e) => handleChange(i, 'recurring', e.target.checked)}
-              />
-              <span>Recurring monthly</span>
-            </label>
-          </div>
-        ))}
-
-        <div className="flex justify-between text-sm font-medium text-gray-700">
-          <p>💸 Total Expenses: <span className="text-[#A72608]">${totalExpenses.toFixed(2)}</span></p>
-          <p>💰 Total Income: <span className="text-[#1D7E5F]">${totalIncome.toFixed(2)}</span></p>
-        </div>
-
-        <button
-          type="button"
-          onClick={addEntry}
-          className="w-full bg-[#29AB87] text-white py-2 rounded-xl hover:bg-[#218F71] transition"
+      {/* Category */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-[#1D7E5F]">Category</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         >
-          ＋ Add Another Entry
-        </button>
+          <option value="food">Food</option>
+          <option value="gas">Gas</option>
+          <option value="rent">Rent</option>
+          <option value="clothes">Clothes</option>
+          <option value="recreation">Recreation</option>
+          <option value="utilities">Utilities</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
 
-        <button
-          type="submit"
-          className="w-full mt-2 bg-[#1D7E5F] text-white py-2 rounded-xl hover:bg-[#155D47] transition"
-        >
-          Save Entries
-        </button>
-      </form>
-    </div>
+      {/* Optional Note */}
+      <input
+        type="text"
+        placeholder="Optional note"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+      />
+
+      {/* Recurring */}
+      <div className="flex items-center gap-2">
+        <input
+          id="recurring"
+          type="checkbox"
+          checked={recurring}
+          onChange={(e) => setRecurring(e.target.checked)}
+          className="w-4 h-4"
+        />
+        <label htmlFor="recurring" className="text-sm text-[#1D7E5F]">
+          Recurring monthly
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        className="bg-[#29AB87] hover:bg-[#218F71] text-white px-4 py-2 rounded-md text-sm w-full"
+      >
+        ➕ Save Entry
+      </button>
+    </form>
   );
 };
 
 export default Input;
+
