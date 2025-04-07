@@ -1,5 +1,5 @@
 // Dashboard.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import dayjs from 'dayjs';
 import QuoteCard from '../components/QuoteCard';
 import Calendar from '../components/calendar';
@@ -26,8 +26,7 @@ const Dashboard = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative flex flex-col items-center px-4 py-6"
-      style={{ backgroundImage: "url('/assets/MoneyMagicBG.png')" }}
+      className="min-h-screen bg-money-bg bg-cover bg-center relative flex flex-col items-center px-4 py-6"
     >
       {/* Background Blur Layer */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />

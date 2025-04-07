@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { isLoggedInVar } from "../graphql/cache";
+import { onLogout } from "../utils/auth";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -9,16 +10,15 @@ const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    isLoggedInVar(false);
+    onLogout();
     navigate("/login");
   };
 
   return (
-    <nav className="bg-white shadow-md p-4">
+    <nav className="sticky top-0 bg-white shadow-md p-4 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold text-blue-600">
-          💰 Money Tracker
+        <Link to="/" className="text-xl font-bold text-[#1D7E5F]">
+          <span className="text-2xl">🌿</span> Real Money Magic
         </Link>
 
         <button
@@ -41,20 +41,17 @@ const Navbar: React.FC = () => {
               >
                 Dashboard
               </Link>
-
-              {/* ✅ */}
               <Link
                 to="/report"
                 className="text-gray-700 hover:text-blue-600 transition"
               >
                 Report
               </Link>
-
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                className="bg-[#29AB87] text-white px-3 py-1 rounded hover:bg-[#218F71] transition"
               >
-                Logout
+                <span className="mr-1">🚪</span> Logout
               </button>
             </>
           ) : (

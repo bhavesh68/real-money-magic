@@ -1,6 +1,6 @@
-# 🛠️ Real Money Magic - Backend Setup Guide (FastAPI + Strawberry GraphQL)
+# 🛠️ Real Money Magic - Fullstack Setup Guide (FastAPI + React + GraphQL)
 
-This guide ensures all team members can run the **FastAPI server** locally after pulling from GitHub, using **Strawberry GraphQL** as the backend API.
+This guide ensures all team members can run both the **FastAPI backend** and **React frontend** locally. Includes `.env` instructions and optional editor setup for a smooth experience.
 
 ---
 
@@ -8,15 +8,13 @@ This guide ensures all team members can run the **FastAPI server** locally after
 
 ```bash
 git pull origin <branch-name>  # or git clone <repo-url>
-cd server
+cd server  # Start with backend setup
 ```
 
-> ⚠️ **IMPORTANT:** If you pulled the architecture before the switch to Strawberry, you must:
-> - ❌ Delete `ariadne` and `graphql-core` from `requirements.txt` and `install.txt`
-> - 🗑️ Remove the old `schema.py` file using `ariadne`
-> - ✅ Confirm only **Strawberry** is being used in `main.py`
-
-This ensures compatibility and prevents route conflicts or broken GraphQL schema references.
+> ⚠️ **IMPORTANT:** If you pulled the architecture before the switch to Strawberry:
+> - ❌ Delete `ariadne` and `graphql-core` from `requirements.txt`
+> - 🗑️ Remove old `schema.py`
+> - ✅ Confirm `main.py` only uses **Strawberry**
 
 ---
 
@@ -26,20 +24,16 @@ This ensures compatibility and prevents route conflicts or broken GraphQL schema
 python -m venv venv
 ```
 
-This creates a `venv/` folder (intentionally ignored by `.gitignore` so it stays local).
-
 ---
 
 ## ✅ Step 2: Activate the Virtual Environment
 
 ### 🔹 On Windows:
-
 ```bash
 venv\Scripts\activate
 ```
 
 ### 🔹 On macOS/Linux:
-
 ```bash
 source venv/bin/activate
 ```
@@ -54,52 +48,44 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-This installs FastAPI, Uvicorn, MongoDB client, JWT, and Strawberry GraphQL libraries.
+---
+
+## ✅ Step 4: Add .env File for Secrets
+
+Create a `.env` file inside the `server/` folder:
+
+```env
+MONGO_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/realmoneydb
+JWT_SECRET=<your_generated_secret>
+```
+
+### ✨ Generating a JWT Secret:
+```bash
+# Optional secure key generation
+openssl rand -hex 32
+```
+
+> Ask your team lead for the proper DB URI if needed.
 
 ---
 
-## ✅ Step 4: Run the Server
+## ✅ Step 5: Run the Backend Server
 
 ### If you're in the `/server` folder:
-
 ```bash
 uvicorn app.main:app --reload
 ```
 
 ### If you're in the **project root** (`real-money-magic/`):
-
 ```bash
 uvicorn app.main:app --reload --app-dir server
 ```
 
 ---
 
-## ✅ Step 5: Add `.env` File (If Needed)
+## ✅ Step 6: Optional VS Code IntelliSense Setup
 
-If the app needs environment variables:
-
-Create a `.env` file inside the `server/` folder:
-
-```env
-MONGO_URL=your_mongodb_uri_here
-JWT_SECRET=your_secret_here
-```
-
-> Ask your team lead if unsure what values to use.
-
----
-
-## ✅ Step 6: VS Code IntelliSense Setup (Optional but Recommended)
-
-To make VS Code properly resolve backend imports and Tailwind classes:
-
-1. In the **root folder** of the project (not inside `client/` or `server/`), create:
-
-```bash
-.vscode/settings.json
-```
-
-2. Add this content:
+Inside `.vscode/settings.json` at the **project root**:
 
 ```json
 {
@@ -115,32 +101,15 @@ To make VS Code properly resolve backend imports and Tailwind classes:
 }
 ```
 
-This ensures autocomplete and linting behave properly across both frontend and backend code.
-
 ---
 
-## ✅ Step 7: Running Backend Tests with `pytest`
+## ✅ Step 7: Run Backend Tests with `pytest`
 
-To verify that your backend GraphQL and utility functions work correctly:
-
-### 🔹 Run all backend tests:
 ```bash
 pytest
 ```
 
-### 🔹 What it does:
-- Automatically discovers files like `tests/test_*.py`
-- Runs each `test_...()` function
-- Reports ✅ passes and ❌ failures
-
-### 🔹 Example test result:
-```bash
-tests/test_main.py ..F
-```
-
-### ✅ Tip:
-- Test your GraphQL queries (e.g., `{ hello }`) and auth logic.
-- Update test files if backend behavior changes.
+> Discovers and runs all test files named `test_*.py`
 
 ---
 
@@ -149,15 +118,15 @@ tests/test_main.py ..F
 | Problem                                      | Fix                                                 |
 | -------------------------------------------- | --------------------------------------------------- |
 | `ModuleNotFoundError: No module named 'app'` | Run with `--app-dir server` if using root directory |
-| `venv` not found                             | You must create it using `python -m venv venv`      |
-| `uvicorn` not found                          | Run `pip install -r requirements.txt` inside `venv` |
-| Mongo connection fails                       | Check that `.env` has a valid `MONGO_URL`           |
+| `venv` not found                             | Create it with `python -m venv venv`                |
+| `uvicorn` not found                          | Run `pip install -r requirements.txt` in `venv`     |
+| Mongo connection fails                       | Check `.env` MONGO_URL                              |
 
 ---
 
 ## 🧠 Bonus: One-Command Server Start
 
-In your root `package.json`, you can add:
+Add this to root `package.json`:
 
 ```json
 "scripts": {
@@ -166,27 +135,47 @@ In your root `package.json`, you can add:
 ```
 
 Then run:
-
 ```bash
 npm run start-server
 ```
 
 ---
 
-Now your backend server (Strawberry GraphQL) is running at:\
-[**http://localhost:8000/graphql**](http://localhost:8000/graphql) 🚀
+# 🌐 Frontend Setup (Vite + React + Tailwind CSS)
 
-You can send GraphQL queries like:
+From the **project root**:
 
-```graphql
-query {
-  hello
-}
+```bash
+cd client
+npm install
 ```
 
-Make sure to test endpoints and connect your frontend properly!
+### Run the development server:
+```bash
+npm run dev
+```
+
+> Starts at [http://localhost:5173](http://localhost:5173) by default
 
 ---
 
-For help, contact Alex or check the `README.md` project root. 💬
+## ✅ Frontend `.env` File (Optional)
+
+Inside `client/`, create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000/graphql
+```
+
+> This allows Apollo or fetch clients to call your local backend
+
+---
+
+Now your app is fully running with:
+- ✨ FastAPI backend at [http://localhost:8000/graphql](http://localhost:8000/graphql)
+- 🌐 React frontend at [http://localhost:5173](http://localhost:5173)
+
+You're ready to build, test, and push changes confidently!
+
+For help, contact Alex or check the main README.md. 💬
 

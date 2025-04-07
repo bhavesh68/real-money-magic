@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../graphql/mutations';
 import { useNavigate } from 'react-router-dom';
+import { onLogin, onLogout } from '../utils/auth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,8 +29,7 @@ const Login = () => {
       });
 
       if (data?.login?.accessToken) {
-        localStorage.setItem('token', data.login.accessToken);
-        localStorage.setItem('refresh_token', data.login.refreshToken);
+        onLogin(data.login.accessToken, data.login.refreshToken);
         navigate('/dashboard');
       } else {
         alert('Invalid login');
@@ -42,8 +42,7 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative flex items-center justify-center px-4"
-      style={{ backgroundImage: "url('/assets/MoneyMagicBG.png')" }}
+      className="min-h-screen bg-money-bg bg-cover bg-center relative flex items-center justify-center px-4"
     >
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
 

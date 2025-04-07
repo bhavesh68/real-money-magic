@@ -1,77 +1,121 @@
 // src/App.tsx (simplified - no Layout)
+import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 
-import { Routes, Route, Navigate, Router } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import Login from "./components/login";
-import Signup from "./screens/Signup";
+import Signup from "./components/Signup";
 import Dashboard from "./screens/Dashboard";
-import Hello from "./screens/Hello";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/NavBar";
+import Hello from "./components/Hello";
+import LayoutWithNavbar from './components/LayoutWithNavbar'; // This is where the NavBar is linked to
+import { isLoggedInVar } from "./graphql/cache";
 
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    isLoggedInVar(!!token);
+  }, []);
+
   return (
-    <>
-      <Navbar />
       <Routes>
         {/* Default route redirects to login */}
         <Route path="/" element={<Navigate to="/login" />} />
 
-        {/* Public pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/hello" element={<Hello />} />
+      {/* Public pages */}
+      <Route 
+        path="/login" 
+          element={
+            <PublicRoute>
+              <LayoutWithNavbar>
+                <Login />
+              </LayoutWithNavbar>
+            </PublicRoute>
+          } 
+      />
+      <Route 
+        path="/signup" 
+          element={
+            <PublicRoute> 
+              <LayoutWithNavbar>
+                <Signup />
+              </LayoutWithNavbar>
+            </PublicRoute>
+          } 
+      />
+      <Route 
+        path="/hello"
+          element={
+            <PublicRoute> 
+              <LayoutWithNavbar>
+                <Hello />
+              </LayoutWithNavbar>
+            </PublicRoute>  
+          } 
+      />
 
-        {/* Protected pages */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
+      {/* Protected pages */}
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/transactions"
-          element={
-            <ProtectedRoute>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/transactions"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <div>Transactions Page</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/day"
-          element={
-            <ProtectedRoute>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/day"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <div>Day View</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/week"
-          element={
-            <ProtectedRoute>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/week"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <div>Week View</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/month"
-          element={
-            <ProtectedRoute>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/month"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <div>Month View</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
               <div>Profile Page</div>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </>
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
 

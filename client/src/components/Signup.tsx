@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { REGISTER_USER } from "../graphql/mutations";
 import { useNavigate } from "react-router-dom";
+import { isLoggedInVar } from '../graphql/cache';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -49,8 +50,7 @@ const Signup = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative flex items-center justify-center px-4"
-      style={{ backgroundImage: "url('/assets/MoneyMagicBG.png')" }}
+      className="min-h-screen bg-money-bg bg-cover bg-center relative flex items-center justify-center px-4"
     >
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
 
