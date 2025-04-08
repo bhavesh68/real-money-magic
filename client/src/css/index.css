@@ -40,3 +40,26 @@
   @apply bg-[#1D7E5F] text-white rounded px-2 py-1 text-xs;
 }
 
+/* ✨ Elegant Sparkle Layer for QuoteCard */
+.sparkle-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #fff9c4;
+  opacity: 0.3;
+  animation: sparkle-blink 4s infinite ease-in-out;
+}
+
+@keyframes sparkle-blink {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.4); }
+}
