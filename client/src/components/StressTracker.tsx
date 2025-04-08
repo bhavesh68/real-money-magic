@@ -4,10 +4,16 @@ interface StressTrackerProps {
   date: string;
   currentEmoji?: '😊' | '🥺' | '🤯';
   onEmojiChange: (emoji: '😊' | '🥺' | '🤯') => void;
+  onClose: () => void; // 👈 Added for auto-close
 }
 
-const StressTracker = ({ date, currentEmoji, onEmojiChange }: StressTrackerProps) => {
+const StressTracker = ({ date, currentEmoji, onEmojiChange, onClose }: StressTrackerProps) => {
   const options: Array<'😊' | '🥺' | '🤯'> = ['😊', '🥺', '🤯'];
+
+  const handleEmojiSelect = (emoji: '😊' | '🥺' | '🤯') => {
+    onEmojiChange(emoji);  // Save the emoji
+    onClose();             // Auto-close the tracker
+  };
 
   return (
     <div className="bg-white rounded-xl shadow p-4 border border-[#1D7E5F] mb-6 w-full">
@@ -23,7 +29,7 @@ const StressTracker = ({ date, currentEmoji, onEmojiChange }: StressTrackerProps
                 ? 'bg-[#29AB87] text-white'
                 : 'bg-gray-100 hover:bg-[#f0fdfa]'
             }`}
-            onClick={() => onEmojiChange(emoji)}
+            onClick={() => handleEmojiSelect(emoji)}
             aria-label={`Select ${emoji}`}
           >
             {emoji}

@@ -11,9 +11,10 @@ interface CalendarProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
   entries: Entry[];
+  stressEntries: { [date: string]: '😊' | '🥺' | '🤯' }; 
 }
 
-const Calendar = ({ selectedDate, onDateChange, entries }: CalendarProps) => {
+const Calendar = ({ selectedDate, onDateChange, entries, stressEntries }: CalendarProps) => {
   const fullCalendarRef = useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] = React.useState<'dayGridDay' | 'dayGridWeek' | 'dayGridMonth'>('dayGridDay');
 
@@ -22,8 +23,14 @@ const Calendar = ({ selectedDate, onDateChange, entries }: CalendarProps) => {
   }, [currentView]);
 
   const entriesForSelectedDay = entries.filter((e) => e.date === selectedDate);
-  const totalExpenses = entriesForSelectedDay.filter((e) => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
-  const totalIncome = entriesForSelectedDay.filter((e) => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+  const totalExpenses = entriesForSelectedDay
+    .filter((e) => e.type === 'expense')
+    .reduce((sum, e) => sum + e.amount, 0);
+  const totalIncome = entriesForSelectedDay
+    .filter((e) => e.type === 'income')
+    .reduce((sum, e) => sum + e.amount, 0);
+
+    const emojiForDay = stressEntries[selectedDate];
 
   return (
     <div className="bg-white border-2 border-[#29AB87] rounded-2xl p-6 shadow-xl w-full max-w-3xl">
@@ -61,8 +68,10 @@ const Calendar = ({ selectedDate, onDateChange, entries }: CalendarProps) => {
       {currentView === 'dayGridDay' ? (
         <>
           <h2 className="text-2xl font-bold text-center text-[#1D7E5F] mb-4">
-            {dayjs(selectedDate).format('MMMM D')}
+            {dayjs(selectedDate).format('MMMM D')}{" "}
+            <span>{emojiForDay || ''}</span>
           </h2>
+
           <TodaySummary
             date={selectedDate}
             entries={entriesForSelectedDay}
@@ -82,11 +91,18 @@ const Calendar = ({ selectedDate, onDateChange, entries }: CalendarProps) => {
             onDateChange(info.dateStr);
             setCurrentView('dayGridDay');
           }}
-          events={entries.map((entry) => ({
-            title: `${entry.type === 'income' ? '+' : '-'}$${entry.amount}`,
-            date: entry.date,
-            color: entry.type === 'income' ? '#29AB87' : '#A7C4B5',
-          }))}
+          events={[
+            ...entries.map((entry: Entry) => ({
+              title: `${entry.type === 'income' ? '+' : '-'}$${entry.amount}`,
+              date: entry.date,
+              color: entry.type === 'income' ? '#29AB87' : '#A7C4B5',
+            })),
+            ...Object.entries(stressEntries).map(([date, emoji]) => ({
+              title: emoji,
+              date,
+              color: '#FFF8DC',
+            })),
+          ]}          
         />
       )}
     </div>
