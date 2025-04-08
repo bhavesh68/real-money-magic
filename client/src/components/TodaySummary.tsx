@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import type { Entry } from '../types/entries'
-
+import type { Entry } from '../types/entries';
 
 interface TodaySummaryProps {
   totalExpenses: number;
   totalIncome: number;
   entries: Entry[];
   date: string;
+  stressLevel?: '😊' | '🥺' | '🤯';
 }
 
-const TodaySummary = ({ totalExpenses, totalIncome, entries, date }: TodaySummaryProps) => {
+const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }: TodaySummaryProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
@@ -44,6 +44,9 @@ const TodaySummary = ({ totalExpenses, totalIncome, entries, date }: TodaySummar
       <div className="space-y-2">
         <p className="text-[#1D7E5F] font-semibold">💸 Total Expenses: ${totalExpenses.toFixed(2)}</p>
         <p className="text-[#1D7E5F] font-semibold">💰 Total Income: ${totalIncome.toFixed(2)}</p>
+        {stressLevel && (
+          <p className="text-[#1D7E5F] font-semibold text-xl">🧠 Stress Level: {stressLevel}</p>
+        )}
 
         <button
           onClick={() => setShowDetails(!showDetails)}

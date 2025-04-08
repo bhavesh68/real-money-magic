@@ -30,6 +30,20 @@ const Dashboard = () => {
     >
       {/* Background Blur Layer */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
+       {/* ✨ Sparkle Overlay Layer */}
+       <div className="sparkle-layer">
+        {[...Array(25)].map((_, i) => (
+          <div
+            key={i}
+            className="sparkle"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Content Layer */}
       <div className="relative z-10 w-full flex flex-col items-center">

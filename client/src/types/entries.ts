@@ -1,6 +1,6 @@
 // types/entry.ts
 export type Entry = {
-    type: 'expense' | 'income';
+    type: 'expense' | 'income' | 'stress';
     amount: number;
     category: string;
     note?: string;

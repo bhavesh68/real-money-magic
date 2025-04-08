@@ -40,26 +40,35 @@
   @apply bg-[#1D7E5F] text-white rounded px-2 py-1 text-xs;
 }
 
-/* ✨ Elegant Sparkle Layer for QuoteCard */
+/* ✨ Subtle Sparkle Animation for Jungle Background */
+/* ✨ Subtle Sparkle Animation for Jungle Background */
+@keyframes sparkle-blink {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.6);
+  }
+}
+
 .sparkle-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 5;
   overflow: hidden;
-  z-index: 0;
 }
 
 .sparkle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 6px;                  /* 👈 Bigger sparkle dots */
+  height: 6px;
+  background-color: #ffffffcc;   /* 👈 Soft, creamy glow */
   border-radius: 9999px;
-  background-color: #fff9c4;
-  opacity: 0.3;
-  animation: sparkle-blink 4s infinite ease-in-out;
-}
-
-@keyframes sparkle-blink {
-  0%, 100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.4); }
+  opacity: 0.2;
+  animation: sparkle-blink 6s ease-in-out infinite;
+  box-shadow: 0 0 6px #ffffffcc;
+  filter: blur(1px);           /* 👈 Adds dreamy soft edges */
 }
