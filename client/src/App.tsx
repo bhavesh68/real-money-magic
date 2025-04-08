@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Login from "./components/login";
 import Signup from "./components/Signup";
 import Dashboard from "./screens/Dashboard";
+import ProfilePage from './screens/ProfilePage';
 import Hello from "./components/Hello";
 import LayoutWithNavbar from './components/LayoutWithNavbar'; // This is where the NavBar is linked to
 import { isLoggedInVar } from "./graphql/cache";
@@ -110,7 +111,7 @@ function App() {
         element={
           <PrivateRoute>
             <LayoutWithNavbar>
-              <div>Profile Page</div>
+              <ProfilePage />
             </LayoutWithNavbar>
           </PrivateRoute>
         }

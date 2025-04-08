@@ -25,12 +25,26 @@ const QuoteCard = () => {
   }, []); 
 
   return (
-    <div className="bg-white/80 rounded-xl shadow-lg p-6 max-w-xl mx-auto text-center relative backdrop-blur-sm border border-yellow-200">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-yellow-100/40 via-transparent to-yellow-200/40 rounded-xl pointer-events-none z-0" />
+    <div className="relative bg-white/80 rounded-xl shadow-lg p-6 max-w-3xl w-full mx-auto backdrop-blur-sm border border-yellow-200 overflow-hidden">
+      {/* ✨ Sparkle Background Layer */}
+      <div className="sparkle-layer">
+        {Array.from({ length: 25 }).map((_, i) => (
+          <div
+            key={i}
+            className="sparkle"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main Content */}
       <div className="relative z-10">
-        <p className="text-[#1D7E5F] font-medium italic text-lg leading-relaxed">
-          “{quote}”
-        </p>
+        <h2 className="text-2xl font-bold text-left text-[#1D7E5F] mb-2">Today At A Glance <span className="animate-pulse text-lg">...</span></h2>
+        <p className="text-[#1D7E5F] font-medium italic text-lg leading-relaxed">“{quote}”</p>
         <p className="text-sm text-gray-700 mt-4 font-semibold">— {author}</p>
       </div>
     </div>

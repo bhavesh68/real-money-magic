@@ -33,8 +33,7 @@ const Dashboard = () => {
 
       {/* Content Layer */}
       <div className="relative z-10 w-full flex flex-col items-center">
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-[#1D7E5F] mb-4">Today At A Glance</h1>
+        {/* Removed the external <h1> title here */}
 
         {/* Inspirational Quote */}
         <QuoteCard />

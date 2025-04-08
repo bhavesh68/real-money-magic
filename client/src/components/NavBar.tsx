@@ -47,6 +47,12 @@ const Navbar: React.FC = () => {
               >
                 Report
               </Link>
+                {/* 👤 Profile Icon */}
+              <Link to="/profile">
+              <div className="w-9 h-9 rounded-full bg-white/60 backdrop-blur-sm shadow flex items-center justify-center text-[#1D7E5F] text-lg hover:shadow-md transition">
+                👤
+              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="bg-[#29AB87] text-white px-3 py-1 rounded hover:bg-[#218F71] transition"
