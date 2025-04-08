@@ -1,5 +1,6 @@
 {
     "scripts":{
-    "start-server": "uvicorn app.main:app --reload"
+    "start-server": "uvicorn app.main:app --reload",
+    "activate": "source venv/scripts/activate"
     }
 }

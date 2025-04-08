@@ -1,22 +1,25 @@
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useState, useEffect } from "react";
 
+// ─── GraphQL Queries & Mutations ──────────────────────────────
+
 const GET_USER_PROFILE = gql`
   query GetUserProfile {
     me {
       id
-      first_name
-      last_name
+      firstName
+      lastName
       email
     }
   }
 `;
 
 const UPDATE_USER_PROFILE = gql`
-  mutation UpdateUserProfile($name: String!, $email: String!) {
-    updateUserProfile(name: $name, email: $email) {
+  mutation UpdateUserProfile($firstName: String!, $lastName: String!, $email: String!) {
+    updateUserProfile(firstName: $firstName, lastName: $lastName, email: $email) {
       id
-      name
+      firstName
+      lastName
       email
     }
   }
@@ -33,6 +36,8 @@ const CHANGE_PASSWORD = gql`
     }
   }
 `;
+
+// ─── Custom Hook ──────────────────────────────────────────────
 
 export const useProfile = () => {
   const { loading, error, data, refetch } = useQuery(GET_USER_PROFILE);
@@ -52,15 +57,15 @@ export const useProfile = () => {
   
   useEffect(() => {
     if (!loading && data) {
-      setFirstName(data.me.first_name);
-      setLastName(data.me.last_name);
+      setFirstName(data.me.firstName);
+      setLastName(data.me.lastName);
       setEmail(data.me.email);
     }
   }, [loading, data]);  
 
   const handleProfileUpdate = async () => {
     try {
-      await updateProfile({ variables: { name, email } });
+      await updateProfile({ variables: { firstName, lastName, email } });
       setSuccessMsg("✅ Profile updated successfully!");
       refetch();
     } catch (err) {

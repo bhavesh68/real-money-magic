@@ -18,7 +18,7 @@ from app.auth import jwt  # Ensuring JWT config is loaded
 
 # ⬇️ Importing modular resolvers
 from app.graphql.resolvers.auth_resolvers import AuthQuery, AuthMutation
-from app.graphql.resolvers.user_resolvers import UserQuery
+from app.graphql.resolvers.user_resolvers import UserQuery, UserMutation
 from app.graphql.resolvers.project_resolvers import ProjectQuery, ProjectMutation
 from app.models.project import Project
 
@@ -40,7 +40,7 @@ class Query(AuthQuery, UserQuery, ProjectQuery):
         return "Hello from the backend! FastAPI + GraphQL!"
     
 @strawberry.type
-class Mutation(AuthMutation, ProjectMutation): 
+class Mutation(AuthMutation, ProjectMutation, UserMutation): 
     pass
 
 # Use AuthMutation directly
