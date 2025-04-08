@@ -7,6 +7,29 @@ from app.models.project import Project
 from app.models.user import User
 from app.auth.auth import get_current_user_gql 
 
+# INPUT types for mutations
+@strawberry.input
+class BudgetEntryInput:
+    category: str
+    amount: float
+    type: str
+    recurring: bool
+    note: str | None = None
+
+@strawberry.input
+class CalendarItemInput:
+    category: str
+    amount: float
+    type: str
+    recurring: bool
+    note: str | None = None
+
+@strawberry.input
+class CalendarEntryInput:
+    date: str
+    entries: List[CalendarItemInput]
+
+# OUTPUT types for queries
 @strawberry.type
 class BudgetEntryType:
     category: str
@@ -62,3 +85,21 @@ class ProjectMutation:
         user.projects.remove(project.id)
         await user.save()
         return "Project deleted"
+    
+    @strawberry.mutation
+    async def update_budget_data(
+        self,
+        info: Info,
+        project_id: strawberry.ID,
+        budget_data: List[BudgetEntryInput] 
+    ) -> ProjectType:
+        user: User = await get_current_user_gql(info)
+        project = await Project.get(PydanticObjectId(project_id))
+
+        if not project or project.id not in user.projects:
+            raise Exception("Unauthorized or project not found")
+
+        project.budget_data = budget_data
+        await project.save()
+        return ProjectType(**project.dict())
+
