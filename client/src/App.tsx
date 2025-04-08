@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Login from "./components/login";
 import Signup from "./components/Signup";
 import ProfilePage from "./screens/ProfilePage";
+import ProjectView from "./screens/ProjectView";
 import Dashboard from "./screens/Dashboard";
 import Hello from "../archive/Hello";
 import LayoutWithNavbar from './components/LayoutWithNavbar'; // This is where the NavBar is linked to
@@ -57,7 +58,7 @@ function App() {
 
       {/* Protected pages */}
       <Route
-        path="/dashboard"
+        path="/project/:id"
         element={
           <PrivateRoute>
             <LayoutWithNavbar>
@@ -112,6 +113,16 @@ function App() {
           <PrivateRoute>
             <LayoutWithNavbar>
               <ProfilePage />
+            </LayoutWithNavbar>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/project/:id"
+        element={
+          <PrivateRoute>
+            <LayoutWithNavbar>
+              <ProjectView />
             </LayoutWithNavbar>
           </PrivateRoute>
         }

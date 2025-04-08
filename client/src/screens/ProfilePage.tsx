@@ -1,7 +1,13 @@
 import React from "react";
 import ProfileForm from "../components/ProfileForm";
+import { useAllProjects } from "../hooks/useAllProjects";
+import { useNavigate } from "react-router-dom";
+import { ProjectSummary } from "../types/project";
 
 const ProfilePage = () => {
+  const { projects, loading, error } = useAllProjects();
+  const navigate = useNavigate();
+
   return (
     <div
       className="min-h-screen bg-money-bg bg-cover bg-center relative flex flex-col items-center px-4 py-6"
@@ -39,7 +45,30 @@ const ProfilePage = () => {
 
           <div>
             <h2 className="text-[#1D7E5F] font-semibold">📁 Projects</h2>
-            <p className="text-gray-700">No active projects yet.</p>
+
+              {loading && <p className="text-gray-700">Loading your projects...</p>}
+              {error && <p className="text-red-500">Error fetching projects 😢</p>}
+
+              {!loading && projects.length === 0 && (
+                <p className="text-gray-700">No active projects yet.</p>
+              )}
+
+              <ul className="mt-2 space-y-2">
+                {projects.map((project: ProjectSummary) => (
+                  <li
+                    key={project.id}
+                    onClick={() => navigate(`/project/${project.id}`)}
+                    className="cursor-pointer px-4 py-2 rounded-lg bg-white shadow hover:bg-gray-100 border border-[#29AB87]"
+                  >
+                    <div className="text-lg font-semibold text-[#1D7E5F]">
+                      {project.title}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Created: {new Date(project.createdAt).toLocaleString()}
+                    </div>
+                  </li>
+                ))}
+              </ul>
           </div>
         </div>
       </div>
