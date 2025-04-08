@@ -9,6 +9,21 @@ const ProfilePage = () => {
       {/* Background Blur Layer */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
 
+      {/* ✨ Sparkle Overlay Layer */}
+      <div className="sparkle-layer">
+        {[...Array(25)].map((_, i) => (
+          <div
+            key={i}
+            className="sparkle"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Foreground Content */}
       <div className="relative z-10 w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 border border-[#29AB87]">
         {/* Top Section */}
