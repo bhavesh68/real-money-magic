@@ -1,5 +1,5 @@
 import React from "react";
-import ProfileForm from "../components/ProfileForm";
+import ProfileForm01 from "../components/ProfileForm01";
 
 const ProfilePage = () => {
   return (
@@ -16,7 +16,7 @@ const ProfilePage = () => {
         <p className="text-lg text-[#1D7E5F] font-medium mb-6">✨ Hey there, RockStar!</p>
 
         {/* Profile Details */}
-        <ProfileForm />
+        <ProfileForm01 />
 
         {/* Future Enhancements Placeholder */}
         <div className="mt-8 space-y-4">
