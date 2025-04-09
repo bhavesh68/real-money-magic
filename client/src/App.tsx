@@ -9,6 +9,7 @@ import Signup from "./components/Signup";
 import ProfilePage from "./screens/ProfilePage";
 import ProjectView from "./screens/ProjectView";
 import Dashboard from "./screens/Dashboard";
+import LandingPage from "./screens/LandingPage";
 import Hello from "../archive/Hello";
 import LayoutWithNavbar from './components/LayoutWithNavbar'; // This is where the NavBar is linked to
 import { isLoggedInVar } from "./graphql/cache";
@@ -21,10 +22,18 @@ function App() {
 
   return (
       <Routes>
-        {/* Default route redirects to login */}
-        <Route path="/" element={<Navigate to="/login" />} />
+      {/* ✅ Show LandingPage directly at `/` */}
+      <Route 
+         path="/" 
+          element={
+           <PublicRoute>
+              <LayoutWithNavbar>
+                <LandingPage />
+              </LayoutWithNavbar>
+          </PublicRoute>
+      } 
+  />
 
-      {/* Public pages */}
       <Route 
         path="/login" 
           element={
