@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "install-client": "cd client && npm install || echo 'No package.json in client'",
-    "install-server-pip": "cd server && pip install -r install.txt || echo 'No install.txt in server'",
+    "install-server-pip": "cd server && pip install -r requirements.txt || echo 'No requirements.txt in server'",
     "install": "npm run install-client && npm run install-server-pip",
 
     "build-client": "cd client && npm run build",
