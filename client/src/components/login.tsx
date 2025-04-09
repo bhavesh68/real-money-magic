@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../graphql/mutations';
 import { useNavigate } from 'react-router-dom';
@@ -79,7 +80,7 @@ const Login = () => {
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
           Don’t have an account?{' '}
-          <a href="/signup" className="text-[#1D7E5F] hover:underline">Create one</a>
+          <Link to="/signup" className="text-[#1D7E5F] hover:underline">Create one</Link>
         </p>
       </div>
     </div>
