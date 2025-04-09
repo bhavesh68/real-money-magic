@@ -5,16 +5,31 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import dayjs from 'dayjs';
 import TodaySummary from './TodaySummary';
-import type { Entry } from '../types/entries';
+import type { Entry, CalendarEntry } from '../types/entries';
 
 interface CalendarProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
   entries: Entry[];
-  stressEntries: { [date: string]: '😊' | '🥺' | '🤯' }; 
+  stressEntries: { [date: string]: '😊' | '🥺' | '🤯' };
+  setEntries: React.Dispatch<React.SetStateAction<Entry[]>>; 
+  saveCalendarData: (data: CalendarEntry[]) => Promise<void>; 
+  budgetData?: {
+    category: string;
+    amount: number;
+    note?: string;
+  }[];
 }
 
-const Calendar = ({ selectedDate, onDateChange, entries, stressEntries }: CalendarProps) => {
+const Calendar = ({ 
+  selectedDate,
+  onDateChange,
+  entries,
+  stressEntries,
+  setEntries,
+  saveCalendarData,
+  budgetData, }: CalendarProps) => {
+
   const fullCalendarRef = useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] = React.useState<'dayGridDay' | 'dayGridWeek' | 'dayGridMonth'>('dayGridDay');
 
@@ -74,9 +89,13 @@ const Calendar = ({ selectedDate, onDateChange, entries, stressEntries }: Calend
 
           <TodaySummary
             date={selectedDate}
-            entries={entriesForSelectedDay}
+            entries={entries}
             totalExpenses={totalExpenses}
             totalIncome={totalIncome}
+            stressLevel={stressEntries[selectedDate]}
+            setEntries={setEntries}
+            saveCalendarData={saveCalendarData}
+            budgetData={budgetData}
           />
         </>
       ) : (
@@ -92,17 +111,41 @@ const Calendar = ({ selectedDate, onDateChange, entries, stressEntries }: Calend
             setCurrentView('dayGridDay');
           }}
           events={[
-            ...entries.map((entry: Entry) => ({
-              title: `${entry.type === 'income' ? '+' : '-'}$${entry.amount}`,
-              date: entry.date,
-              color: entry.type === 'income' ? '#29AB87' : '#A7C4B5',
+            // Income totals per day
+            ...Object.entries(
+              entries
+                .filter((e): e is Entry & { date: string } => !!e.date && e.type === 'income')
+                .reduce((acc, e) => {
+                  acc[e.date] = (acc[e.date] || 0) + e.amount;
+                  return acc;
+                }, {} as Record<string, number>)
+            ).map(([date, total]) => ({
+              title: `+ $${total.toFixed(2)}`,
+              date,
+              color: '#56C4A0', // lighter jungle green
             })),
+          
+            // Expense totals per day
+            ...Object.entries(
+              entries
+                .filter((e): e is Entry & { date: string } => !!e.date && e.type === 'expense')
+                .reduce((acc, e) => {
+                  acc[e.date] = (acc[e.date] || 0) + e.amount;
+                  return acc;
+                }, {} as Record<string, number>)
+            ).map(([date, total]) => ({
+              title: `- $${total.toFixed(2)}`,
+              date,
+              color: '#F6A5A5', // salmon pink
+            })),
+          
+            // Stress emoji
             ...Object.entries(stressEntries).map(([date, emoji]) => ({
               title: emoji,
               date,
               color: '#FFF8DC',
             })),
-          ]}          
+          ]}                   
         />
       )}
     </div>

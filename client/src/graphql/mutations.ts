@@ -28,3 +28,49 @@ export const REMOVE_USER = gql`
     }
   }
 `;
+
+export const CREATE_PROJECT = gql`
+  mutation CreateProject($title: String!, $notes: String) {
+    createProject(title: $title, notes: $notes) {
+      id
+      title
+      notes
+      createdAt
+    }
+  }
+`;
+
+export const DELETE_PROJECT = gql`
+  mutation DeleteProject($projectId: ID!) {
+    deleteProject(projectId: $projectId)
+  }
+`;
+
+export const UPDATE_PROJECT = gql`
+  mutation UpdateProject($projectId: ID!, $title: String!, $notes: String) {
+    updateProject(projectId: $projectId, title: $title, notes: $notes) {
+      id
+      title
+      notes
+      createdAt
+    }
+  }
+`;
+
+export const SAVE_CALENDAR_DATA = gql`
+  mutation SaveCalendarData($input: [CalendarEntryInput!]!) {
+    saveCalendarData(input: $input) {
+      calendarData {
+        date
+        entries {
+          category
+          amount
+          type
+          note
+          recurring
+        }
+      }
+    }
+  }
+`;
+

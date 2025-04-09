@@ -1,31 +1,33 @@
-// this is the page where you ask user to input their expected budget and then what their spending limit is 
-//this is the place where color coding would get set or other method
+// SetBudget.tsx – Monthly budget input + project save mutation
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
+import { Budget } from '../types/budget';
+import { stripTypenameDeep } from '../utils/stripTypename';
 
-const ADD_BUDGET = gql`
-  mutation AddBudget($input: BudgetInput!) {
-    addBudget(input: $input) {
-      success
-      message
+const UPDATE_BUDGET = gql`
+  mutation UpdateBudget($projectId: ID!, $budgetData: [BudgetEntryInput!]!) {
+    updateBudgetData(projectId: $projectId, budgetData: $budgetData) {
+      id
+      budgetData {
+        category
+        amount
+        type
+        recurring
+        note
+      }
     }
   }
 `;
 
-interface Budget {
-  food: number;
-  gas: number;
-  rent: number;
-  clothes: number;
-  recreation: number;
-  utilities: number;
-  otherAmount: number;
-  otherNote: string;
+interface SetBudgetProps {
+  initialData?: Budget;
+  onSave?: (data: Budget) => Promise<void>;
+  projectId: string;
 }
 
-const SetBudget: React.FC = () => {
-  const [budget, setBudget] = useState<Budget>({
+const SetBudget: React.FC<SetBudgetProps> = ({ initialData, onSave, projectId }) => {
+  const fallback: Budget = {
     food: 0,
     gas: 0,
     rent: 0,
@@ -34,43 +36,75 @@ const SetBudget: React.FC = () => {
     utilities: 0,
     otherAmount: 0,
     otherNote: '',
-  });
+  };
+  
+  const [budget, setBudget] = useState<Budget>(() =>
+    { return { ...fallback, ...(initialData || {}) }; }
+  );
 
-  const [addBudget, { loading, error, data }] = useMutation(ADD_BUDGET);
+  useEffect(() => {
+    if (initialData) {
+      setBudget({ ...fallback, ...initialData });
+    }
+  }, [initialData]);  
+
+  const [updateBudget, { loading, error }] = useMutation(UPDATE_BUDGET);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setBudget({ ...budget, [name]: name === 'otherNote' ? value : parseFloat(value) });
+    setBudget(prev => ({
+      ...prev,
+      [name]: name === 'otherNote' ? value : parseFloat(value || '0')
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    localStorage.setItem('userBudget', JSON.stringify(budget));
-
+  
+    const budgetEntries = Object.entries(budget)
+      .filter(([key]) => key !== 'otherNote')
+      .map(([category, amount]) => ({
+        category,
+        amount,
+        type: 'expense',
+        recurring: false,
+        note: category === 'otherAmount' ? budget.otherNote : ''
+      }));
+  
+    const cleaned = stripTypenameDeep(budgetEntries); 
+  
     try {
-      const response = await addBudget({ variables: { input: budget } });
-      console.log(response.data);
-      alert('Budget submitted successfully!');
+      const response = await updateBudget({
+        variables: {
+          projectId,
+          budgetData: cleaned,
+        },
+      });
+  
+      console.log('[✅ Budget updated]', response.data);
+      alert('Budget saved successfully!');
+  
+      if (onSave) await onSave(budget);
     } catch (err) {
-      console.error('Submission error:', err);
+      console.error('❌ Submission error:', err);
     }
+  
+    localStorage.setItem('userBudget', JSON.stringify(budget));
   };
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded-xl mt-6">
       <h2 className="text-xl font-bold mb-4 text-center">Set Your Monthly Budget</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-      {['food', 'gas', 'rent', 'clothes', 'recreation', 'utilities'].map((category) => (
-        <div key={category}>
-          <label htmlFor={category} className="block font-medium capitalize">
-            {category} ($):
-          </label>
+        {['food', 'gas', 'rent', 'clothes', 'recreation', 'utilities'].map(category => (
+          <div key={category}>
+            <label htmlFor={category} className="block font-medium capitalize">
+              {category} ($):
+            </label>
             <input
               id={category}
               type="number"
               name={category}
-              title={`Enter your monthly ${category} budget`}
               placeholder={`Enter amount for ${category}`}
               value={budget[category as keyof Budget]}
               onChange={handleChange}
@@ -78,38 +112,36 @@ const SetBudget: React.FC = () => {
               min="0"
               required
             />
-        </div>
-      ))}
+          </div>
+        ))}
 
-      <div>
-        <label htmlFor="otherAmount" className="block font-medium">Other ($):</label>
+        <div>
+          <label htmlFor="otherAmount" className="block font-medium">Other ($):</label>
           <input
             id="otherAmount"
             type="number"
             name="otherAmount"
-            title="Enter any other monthly budget amount"
             placeholder="E.g., $50"
             value={budget.otherAmount}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 mt-1"
             min="0"
           />
-      </div>
+        </div>
 
-      <div>
-        <label htmlFor="otherNote" className="block font-medium">Note for Other:</label>
+        <div>
+          <label htmlFor="otherNote" className="block font-medium">Note for Other:</label>
           <input
             id="otherNote"
             type="text"
             name="otherNote"
-            title="Describe what the other category is for"
             placeholder="E.g., gifts, pet care..."
             value={budget.otherNote}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 mt-1"
           />
-      </div>
-      
+        </div>
+
         <button
           type="submit"
           disabled={loading}
@@ -117,8 +149,8 @@ const SetBudget: React.FC = () => {
         >
           {loading ? 'Saving...' : 'Save Budget'}
         </button>
+
         {error && <p className="text-red-600 text-sm mt-2">Error: {error.message}</p>}
-        {data?.addBudget?.success && <p className="text-green-600 text-sm mt-2">Budget saved successfully!</p>}
       </form>
     </div>
   );

@@ -113,7 +113,7 @@ const Input = ({ onAddEntry }: InputProps) => {
 
       <button
         type="submit"
-        className="bg-[#29AB87] hover:bg-[#218F71] text-white px-4 py-2 rounded-md text-sm w-full"
+        className="bg-[#29AB87] hover:bg-[#218F71] text-white px-4 py-2 rounded-full font-semibold text-sm w-full"
       >
         ➕ Save Entry
       </button>

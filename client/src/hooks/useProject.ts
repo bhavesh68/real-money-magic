@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const GET_PROJECT = gql`
   query GetProject($projectId: ID!) {
-    myProjects {
+    getProject(id: $projectId) {
       id
       title
       notes
@@ -26,6 +26,10 @@ const GET_PROJECT = gql`
           recurring
           note
         }
+      }
+      stressData {
+        date
+        emoji
       }
     }
   }
@@ -56,9 +60,25 @@ const UPDATE_CALENDAR = gql`
           category
           amount
           type
-          recurring
           note
+          recurring
+          __typename    
         }
+        __typename       
+      }
+      __typename        
+    }
+  }
+`;
+
+
+const UPDATE_STRESS = gql`
+  mutation UpdateStressData($projectId: ID!, $stressData: [StressDataInput!]!) {
+    updateStressData(projectId: $projectId, stressData: $stressData) {
+      id
+      stressData {
+        date
+        emoji
       }
     }
   }
@@ -69,10 +89,13 @@ const UPDATE_CALENDAR = gql`
 export const useProject = (projectId: string) => {
   const { data, loading, error, refetch } = useQuery(GET_PROJECT, {
     variables: { projectId },
+    onError: (err) => console.error("❌ useProject error:", err.message),
     fetchPolicy: "cache-and-network",
+    skip: !projectId,
   });
 
   const [updateBudget] = useMutation(UPDATE_BUDGET);
+  const [updateStress] = useMutation(UPDATE_STRESS);
   const [updateCalendar] = useMutation(UPDATE_CALENDAR);
 
   const [saving, setSaving] = useState(false);
@@ -91,6 +114,21 @@ export const useProject = (projectId: string) => {
       console.error("Failed to update budget", err);
     }
     setSaving(false);
+  };
+
+  const saveStressData = async (stressData: { [date: string]: string }) => {
+    const dataToSend = Object.entries(stressData).map(([date, emoji]) => ({
+      date,
+      emoji,
+    }));
+    try {
+      await updateStress({
+        variables: { projectId, stressData: dataToSend },
+      });
+      refetch();
+    } catch (err) {
+      console.error("Failed to update stress data", err);
+    }
   };
 
   const saveCalendarData = async (calendarData: any[]) => {
@@ -112,9 +150,10 @@ export const useProject = (projectId: string) => {
   return {
     loading,
     error,
-    project: data?.myProjects?.find((p: any) => p.id === projectId),
+    project: data?.getProject,
     saveBudgetData,
     saveCalendarData,
+    saveStressData,
     saving,
   };
 };

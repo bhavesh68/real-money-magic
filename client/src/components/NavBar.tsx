@@ -35,18 +35,6 @@ const Navbar: React.FC = () => {
         >
           {isLoggedIn ? (
             <>
-              <Link
-                to="/dashboard"
-                className="text-gray-700 hover:text-blue-600 transition"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/report"
-                className="text-gray-700 hover:text-blue-600 transition"
-              >
-                Report
-              </Link>
                 {/* 👤 Profile Icon */}
               <Link to="/profile">
               <div className="w-9 h-9 rounded-full bg-white/60 backdrop-blur-sm shadow flex items-center justify-center text-[#1D7E5F] text-lg hover:shadow-md transition">
