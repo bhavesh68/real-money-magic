@@ -32,6 +32,13 @@ async def lifespan(app: FastAPI):
 # ✅ Now initialize the app with lifespan
 app = FastAPI(lifespan=lifespan)
 
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "message": "Real Money Magic backend is running!"
+    }
+
 # Combine imported queries and mutations
 @strawberry.type
 class Query(UserQuery, ProjectQuery, AuthQuery):
@@ -56,7 +63,9 @@ def hello_route():
 # CORS settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173",
+    "https://realmoneymagicfrontend.onrender.com" 
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
