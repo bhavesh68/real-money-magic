@@ -1,7 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
+  const [showSpill, setShowSpill] = useState(false);
+  const [startAnimation, setStartAnimation] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setStartAnimation(true);
+      setTimeout(() => {
+        setShowSpill(true);
+      }, 2500); // Switch to spilled bag after 2.5s
+
+      setTimeout(() => {
+        setStartAnimation(false);
+        setShowSpill(false);
+      }, 10000); // Reset after 10s
+    }, 30000); // Repeat every 30s
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div
       className="relative min-h-screen bg-cover bg-center flex items-center justify-center text-white text-center px-6"
@@ -25,6 +44,25 @@ const LandingPage = () => {
             }}
           />
         ))}
+      </div>
+
+      {/* 💰 Animated Money Bag */}
+      <div className="absolute z-0 w-full flex justify-center items-start pointer-events-none">
+        {!showSpill && startAnimation && (
+          <img
+            src="/assets/moneybag.png"
+            alt="Money Bag"
+            className="w-32 h-auto animate-fall"
+            style={{ animationDuration: '2.5s' }}
+          />
+        )}
+        {showSpill && (
+          <img
+            src="/assets/moneybagspill.png"
+            alt="Spilled Money Bag"
+            className="w-40 h-auto mt-[30rem] fade-in"
+          />
+        )}
       </div>
 
       {/* Foreground Content */}
@@ -62,16 +100,8 @@ const LandingPage = () => {
           relationship with money.
         </p>
       </div>
-      {/* Jen Animated Money Bag Fall */}
-      <img
-        src="/assets/moneybag.png"
-        alt="Money Bag"
-        className="absolute w-24 sm:w-28 md:w-32 animate-money-drop z-0 pointer-events-none"
-        style={{ animationDelay: '30s' }}
-        />
     </div>
   );
 };
 
 export default LandingPage;
-

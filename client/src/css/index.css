@@ -41,7 +41,6 @@
 }
 
 /* ✨ Subtle Sparkle Animation for Jungle Background */
-/* ✨ Subtle Sparkle Animation for Jungle Background */
 @keyframes sparkle-blink {
   0%, 100% {
     opacity: 0.1;
@@ -63,12 +62,47 @@
 
 .sparkle {
   position: absolute;
-  width: 6px;                  /* 👈 Bigger sparkle dots */
+  width: 6px;
   height: 6px;
-  background-color: #ffffffcc;   /* 👈 Soft, creamy glow */
+  background-color: #ffffffcc;
   border-radius: 9999px;
   opacity: 0.2;
   animation: sparkle-blink 6s ease-in-out infinite;
   box-shadow: 0 0 6px #ffffffcc;
-  filter: blur(1px);           /* 👈 Adds dreamy soft edges */
+  filter: blur(1px);
 }
+
+/* 💸 Money Bag Drop Animation */
+@keyframes fall {
+  0% {
+    transform: translateY(-200%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(27rem);
+    opacity: 1;
+  }
+}
+
+.animate-fall {
+  animation: fall 2.5s ease-in-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
