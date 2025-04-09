@@ -45,7 +45,7 @@ const Calendar = ({
     .filter((e) => e.type === 'income')
     .reduce((sum, e) => sum + e.amount, 0);
 
-    const emojiForDay = stressEntries[selectedDate];
+  const emojiForDay = stressEntries[selectedDate];
 
   return (
     <div className="bg-white border-2 border-[#29AB87] rounded-2xl p-6 shadow-xl w-full max-w-3xl">
@@ -143,7 +143,7 @@ const Calendar = ({
             ...Object.entries(stressEntries).map(([date, emoji]) => ({
               title: emoji,
               date,
-              color: '#FFF8DC',
+              color: '#FFF8DC', // gentle yellow
             })),
           ]}                   
         />

@@ -13,3 +13,15 @@ const LayoutWithNavbar = ({ children }: { children: ReactNode }) => {
 };
 
 export default LayoutWithNavbar;
+
+
+/* i think like this:
+<>
+  <Navbar />
+  <Project>
+    <Outlet /> {/* Or Dashboard content here 
+  </Project>
+  </Footer>
+    </>
+*/
+    
