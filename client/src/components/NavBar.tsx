@@ -36,12 +36,6 @@ const Navbar: React.FC = () => {
           {isLoggedIn ? (
             <>
               <Link
-                to="/dashboard"
-                className="text-gray-700 hover:text-blue-600 transition"
-              >
-                Dashboard
-              </Link>
-              <Link
                 to="/report"
                 className="text-gray-700 hover:text-blue-600 transition"
               >

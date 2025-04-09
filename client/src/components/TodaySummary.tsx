@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import type { Entry } from '../types/entries';
+import { stripTypenameDeep } from '../utils/stripTypename';
+import type { CalendarEntry } from '../types/entries';
 
 interface TodaySummaryProps {
   totalExpenses: number;
@@ -8,11 +10,53 @@ interface TodaySummaryProps {
   entries: Entry[];
   date: string;
   stressLevel?: '😊' | '🥺' | '🤯';
+  setEntries: React.Dispatch<React.SetStateAction<Entry[]>>;
+  saveCalendarData: (data: CalendarEntry[]) => Promise<void>;
+  budgetData?: {
+    category: string;
+    amount: number;
+    note?: string;
+  }[];
 }
 
-const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }: TodaySummaryProps) => {
+const TodaySummary = ({ 
+  totalExpenses,
+  totalIncome,
+  entries,
+  date,
+  stressLevel,
+  setEntries,
+  saveCalendarData,
+  budgetData, }: TodaySummaryProps) => {
+
   const [showDetails, setShowDetails] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+
+  const selectedMonth = dayjs(date).format('YYYY-MM');
+
+  const incomeEntriesThisMonth = entries.filter((e) => {
+    return e.type === 'income' && e.date?.startsWith(selectedMonth);
+  });
+  
+  const seen = new Set<string>();
+  const dedupedIncome = incomeEntriesThisMonth.filter((e) => {
+    const key = `${e.note}-${e.amount}-${e.category}`; // Note-based uniqueness
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  
+  const monthlyIncome = dedupedIncome.reduce((sum, e) => sum + e.amount, 0);
+  useEffect(() => {
+    console.log('✅ Deduped Income Entries:', dedupedIncome);
+  }, [dedupedIncome]);  
+
+  const monthlyExpenses = entries
+    .filter((e) => e.type === 'expense' && e.date?.startsWith(selectedMonth))
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const formatTitle = (str: string) =>
+    str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 
   const expenseBreakdown: Record<string, number> = {};
   const incomeBreakdown: Record<string, number> = {};
@@ -24,13 +68,43 @@ const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }
       categorizedExpenses[entry.category] = categorizedExpenses[entry.category] || [];
       categorizedExpenses[entry.category].push(entry);
     } else if (entry.type === 'income') {
-      const source = entry.note || 'Uncategorized';
+      const source = formatTitle(entry.note || 'Uncategorized');
       incomeBreakdown[source] = (incomeBreakdown[source] || 0) + entry.amount;
     }
   });
 
   const toggleCategory = (cat: string) => {
     setExpandedCategories((prev) => ({ ...prev, [cat]: !prev[cat] }));
+  };
+
+  const handleDeleteEntry = async (entryToDelete: Entry) => {
+    const updated = entries.filter((e) => {
+      return !(
+        e.date === entryToDelete.date &&
+        e.amount === entryToDelete.amount &&
+        e.category === entryToDelete.category &&
+        e.note === entryToDelete.note &&
+        e.type === entryToDelete.type
+      );
+    });
+  
+    setEntries(updated);
+  
+    // Rebuild calendarData to send to backend
+    const calendarMap: { [date: string]: Entry[] } = {};
+    updated.forEach((e) => {
+      calendarMap[e.date!] = [...(calendarMap[e.date!] || []), e];
+    });
+  
+    const calendarData = stripTypenameDeep(
+      Object.entries(calendarMap).map(([date, entries]) => ({
+        date,
+        entries: entries.map(({ date, ...entry }) => entry),
+      }))
+    );
+    await saveCalendarData(calendarData);
+    console.log("🧼 Final calendarData to send:", JSON.stringify(calendarData, null, 2));
+
   };
 
   return (
@@ -47,6 +121,11 @@ const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }
         {stressLevel && (
           <p className="text-[#1D7E5F] font-semibold text-xl">🧠 Stress Level: {stressLevel}</p>
         )}
+
+      <div className="mt-4 border-t pt-4 border-[#29AB87]">
+        <p className="text-[#1D7E5F] font-semibold">📊 Monthly Income: ${monthlyIncome.toFixed(2)}</p>
+        <p className="text-[#1D7E5F] font-semibold">📉 Monthly Expenses: ${monthlyExpenses.toFixed(2)}</p>
+      </div>
 
         <button
           onClick={() => setShowDetails(!showDetails)}
@@ -71,7 +150,18 @@ const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }
                     {expandedCategories[cat] && (
                       <ul className="ml-4 list-disc">
                         {categorizedExpenses[cat].map((entry, idx) => (
-                          <li key={idx}>${entry.amount.toFixed(2)} {entry.note && `- ${entry.note}`}</li>
+                          <li key={idx} className="flex justify-between items-center">
+                            <span>
+                              ${entry.amount.toFixed(2)} {entry.note && `- ${entry.note}`}
+                            </span>
+                            <button
+                              onClick={() => handleDeleteEntry(entry)}
+                              className="text-red-600 hover:text-red-800 text-sm ml-2"
+                              title="Delete entry"
+                            >
+                              🗑️
+                            </button>
+                          </li>
                         ))}
                       </ul>
                     )}
@@ -83,11 +173,39 @@ const TodaySummary = ({ totalExpenses, totalIncome, entries, date, stressLevel }
             <div>
               <p className="font-bold text-[#155D47] mb-1">Income by Source:</p>
               <ul className="list-disc list-inside text-sm text-[#1D7E5F]">
-                {Object.entries(incomeBreakdown).map(([source, amount]) => (
-                  <li key={source}>{source}: ${amount.toFixed(2)}</li>
-                ))}
+                {entries
+                  .filter((e) => e.type === 'income')
+                  .map((entry, idx) => (
+                    <li key={idx} className="flex justify-between items-center">
+                      <span>
+                        ${entry.amount.toFixed(2)} {entry.note && `- ${entry.note}`}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteEntry(entry)}
+                        className="text-red-600 hover:text-red-800 text-sm ml-2"
+                        title="Delete income entry"
+                      >
+                        🗑️
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
+
+            {budgetData && (
+              <div className="mt-4 border-t pt-4 border-[#29AB87]">
+                <h4 className="text-[#1D7E5F] font-semibold mb-2">🧾 Monthly Budget Breakdown:</h4>
+                <ul className="list-disc list-inside text-sm text-[#1D7E5F]">
+                  {budgetData.map((b, idx) => (
+                    <li key={idx}>
+                      {b.category}: ${b.amount.toFixed(2)}
+                      {b.note && ` - ${b.note}`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
           </div>
         )}
       </div>

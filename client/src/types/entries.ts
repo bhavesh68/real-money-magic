@@ -7,4 +7,10 @@ export type Entry = {
     recurring: boolean;
     date?: string;
   };
+
+export type CalendarEntry = {
+    date: string;
+    entries: Entry[];
+  };
   
+export type Emoji = '😊' | '🥺' | '🤯';

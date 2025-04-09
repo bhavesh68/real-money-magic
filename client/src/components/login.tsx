@@ -30,7 +30,7 @@ const Login = () => {
 
       if (data?.login?.accessToken) {
         onLogin(data.login.accessToken, data.login.refreshToken);
-        navigate('/dashboard');
+        navigate('/profile');
       } else {
         alert('Invalid login');
       }

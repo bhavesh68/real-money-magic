@@ -34,13 +34,13 @@ app = FastAPI(lifespan=lifespan)
 
 # Combine imported queries and mutations
 @strawberry.type
-class Query(AuthQuery, UserQuery, ProjectQuery):
+class Query(UserQuery, ProjectQuery, AuthQuery):
     @strawberry.field
     def hello(self) -> str:
         return "Hello from the backend! FastAPI + GraphQL!"
-    
+
 @strawberry.type
-class Mutation(AuthMutation, ProjectMutation, UserMutation): 
+class Mutation(UserMutation, ProjectMutation, AuthMutation):
     pass
 
 # Use AuthMutation directly

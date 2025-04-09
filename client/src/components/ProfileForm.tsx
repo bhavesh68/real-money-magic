@@ -24,10 +24,7 @@ const ProfilePage: React.FC = () => {
   } = useProfile();
 
   useEffect(() => {
-    console.log("📥 Fetched Profile Info:");
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
-    console.log("Email:", email);
+    console.log("📥 Fetched Profile Info:", { firstName, lastName, email });
   }, [firstName, lastName, email]);
 
   if (loading) return <div className="p-4">Loading profile...</div>;
@@ -37,62 +34,85 @@ const ProfilePage: React.FC = () => {
     <div className="p-4 space-y-8">
       <div className="space-y-2">
         <h2 className="text-xl font-semibold">👤 Edit Profile</h2>
+        
+        <label htmlFor="firstName">First Name</label>
         <input
-          className="border rounded p-2 w-full"
+          id="firstName"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          placeholder="Name"
+          placeholder="First Name"
         />
+
+        <label htmlFor="lastName">Last Name</label>
         <input
-          className="border rounded p-2 w-full"
+          id="lastName"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           placeholder="Last Name"
         />
+
+        <label htmlFor="email">Email</label>
         <input
-          className="border rounded p-2 w-full"
+          id="email"
+          type="email"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
         />
+
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-[#29AB87] text-white px-4 py-2 rounded-full font-medium hover:bg-[#218F71] transition"
           onClick={handleProfileUpdate}
         >
           Save
         </button>
+
         {successMsg && <p className="text-green-600">{successMsg}</p>}
       </div>
 
       <div className="space-y-2">
         <h2 className="text-xl font-semibold">🔐 Change Password</h2>
+
+        <label htmlFor="currentPassword">Current Password</label>
         <input
+          id="currentPassword"
           type="password"
-          className="border rounded p-2 w-full"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
           placeholder="Current Password"
         />
+
+        <label htmlFor="newPassword">New Password</label>
         <input
+          id="newPassword"
           type="password"
-          className="border rounded p-2 w-full"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="New Password"
         />
+
+        <label htmlFor="confirmPassword">Confirm New Password</label>
         <input
+          id="confirmPassword"
           type="password"
-          className="border rounded p-2 w-full"
+          className="border rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm New Password"
         />
+
         <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-[#29AB87] text-white px-4 py-2 rounded-full font-medium hover:bg-[#218F71] transition"
           onClick={handlePasswordChange}
         >
           Change Password
         </button>
+
         {passwordMsg && <p className="text-red-600">{passwordMsg}</p>}
       </div>
     </div>
