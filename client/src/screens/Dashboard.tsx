@@ -32,6 +32,11 @@ const Dashboard = () => {
   const [showBudget, setShowBudget] = useState(false);
   const [showStress, setShowStress] = useState(false);
 
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
+    const stored = localStorage.getItem('monthlyBudget');
+    return stored ? parseFloat(stored) : 0;
+  });
+
   // ─── Local States Based on Project Data ──────────────────────────────
   const [entries, setEntries] = useState<Entry[]>([]);
   const [stressEntries, setStressEntries] = useState<{ [date: string]: Emoji }>({});
@@ -84,7 +89,7 @@ const Dashboard = () => {
       await saveCalendarData(stripTypenameDeep(calendarData));
   };
 
-  const handleBudgetSave = async (data: Budget) => {
+/*   const handleBudgetSave = async (data: Budget) => {
     const entries = Object.entries(data)
       .filter(([key]) => key !== 'otherNote')
       .map(([category, amount]) => ({
@@ -96,7 +101,8 @@ const Dashboard = () => {
       }));
   
     await saveBudgetData(stripTypenameDeep(entries)); 
-  };  
+  }; 
+  */ 
   
   const handleEmojiChange = async (emoji: '😊' | '🥺' | '🤯') => {
     setStressEntries((prev) => {
@@ -186,7 +192,7 @@ const Dashboard = () => {
             onClick={() => setShowBudget((prev) => !prev)}
             className="bg-[#29AB87] text-white text-lg font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-[#218F71] transition-all w-full md:w-1/3 md:ml-2"
           >
-            {showBudget ? 'Close Budget ✖' : '🧾 Set Budget (coming soon)'}
+            {showBudget ? 'Close Budget ✖' : '🧾 Set Budget'}
           </button>
 
           <button
@@ -216,13 +222,11 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* 💸 Set Budget Form */}
-        {showBudget && project && id && (
-          <div className="w-full max-w-3xl mb-4">
-            <SetBudget
-              initialData={project.budgetData}
-              onSave={handleBudgetSave}
-              projectId={id}
+      {showBudget && project && id && (
+        <div className="w-full max-w-3xl mb-4">
+          <SetBudget
+            projectId={id}
+            onSave={({ total }) => setMonthlyBudget(total)}
             />
           </div>
         )}
@@ -236,6 +240,7 @@ const Dashboard = () => {
           setEntries={setEntries} 
           saveCalendarData={saveCalendarData}
           budgetData={project.budgetData}
+          monthlyBudget={monthlyBudget}
         />
       </div>
 

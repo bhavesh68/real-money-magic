@@ -17,8 +17,16 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 bg-white shadow-md p-4 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold text-[#1D7E5F]">
-          <span className="text-2xl">🌿</span> Real Money Magic
+        {/* Logo and Title */}
+        <Link to="/" className="flex items-center space-x-2">
+          <img
+            src="/assets/MoneyMagicLogoCoin.png"
+            alt="Real Money Magic Logo"
+            className="w-8 h-8 sm:w-10 sm:h-10"
+          />
+          <span className="text-xl md:text-2xl font-bold font-serif text-[#29AB87] hidden sm:inline">
+            Real Money Magic
+          </span>
         </Link>
 
         <button

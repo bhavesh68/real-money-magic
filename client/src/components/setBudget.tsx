@@ -1,158 +1,53 @@
-// SetBudget.tsx – Monthly budget input + project save mutation
-
-import React, { useEffect, useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { Budget } from '../types/budget';
-import { stripTypenameDeep } from '../utils/stripTypename';
-
-const UPDATE_BUDGET = gql`
-  mutation UpdateBudget($projectId: ID!, $budgetData: [BudgetEntryInput!]!) {
-    updateBudgetData(projectId: $projectId, budgetData: $budgetData) {
-      id
-      budgetData {
-        category
-        amount
-        type
-        recurring
-        note
-      }
-    }
-  }
-`;
+import React, { useState, useEffect } from 'react';
 
 interface SetBudgetProps {
-  initialData?: Budget;
-  onSave?: (data: Budget) => Promise<void>;
   projectId: string;
+  onSave: (budget: { total: number }) => void;
 }
 
-const SetBudget: React.FC<SetBudgetProps> = ({ initialData, onSave, projectId }) => {
-  const fallback: Budget = {
-    food: 0,
-    gas: 0,
-    rent: 0,
-    clothes: 0,
-    recreation: 0,
-    utilities: 0,
-    otherAmount: 0,
-    otherNote: '',
-  };
-  
-  const [budget, setBudget] = useState<Budget>(() =>
-    { return { ...fallback, ...(initialData || {}) }; }
-  );
+const SetBudget: React.FC<SetBudgetProps> = ({ onSave, projectId }) => {
+  const [amount, setAmount] = useState(() => {
+    const stored = localStorage.getItem('monthlyBudget');
+    return stored ? parseFloat(stored) : '';
+  });
 
   useEffect(() => {
-    if (initialData) {
-      setBudget({ ...fallback, ...initialData });
+    // Update local storage whenever amount changes
+    if (typeof amount === 'number' && !isNaN(amount)) {
+      localStorage.setItem('monthlyBudget', amount.toString());
     }
-  }, [initialData]);  
+  }, [amount]);
 
-  const [updateBudget, { loading, error }] = useMutation(UPDATE_BUDGET);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setBudget(prev => ({
-      ...prev,
-      [name]: name === 'otherNote' ? value : parseFloat(value || '0')
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
-    const budgetEntries = Object.entries(budget)
-      .filter(([key]) => key !== 'otherNote')
-      .map(([category, amount]) => ({
-        category,
-        amount,
-        type: 'expense',
-        recurring: false,
-        note: category === 'otherAmount' ? budget.otherNote : ''
-      }));
-  
-    const cleaned = stripTypenameDeep(budgetEntries); 
-  
-    try {
-      const response = await updateBudget({
-        variables: {
-          projectId,
-          budgetData: cleaned,
-        },
-      });
-  
-      console.log('[✅ Budget updated]', response.data);
-      alert('Budget saved successfully!');
-  
-      if (onSave) await onSave(budget);
-    } catch (err) {
-      console.error('❌ Submission error:', err);
+    const parsed = parseFloat(amount.toString());
+    if (!isNaN(parsed)) {
+      localStorage.setItem('monthlyBudget', parsed.toString());
+      onSave({ total: parsed });
     }
-  
-    localStorage.setItem('userBudget', JSON.stringify(budget));
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded-xl mt-6">
-      <h2 className="text-xl font-bold mb-4 text-center">Set Your Monthly Budget</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {['food', 'gas', 'rent', 'clothes', 'recreation', 'utilities'].map(category => (
-          <div key={category}>
-            <label htmlFor={category} className="block font-medium capitalize">
-              {category} ($):
-            </label>
-            <input
-              id={category}
-              type="number"
-              name={category}
-              placeholder={`Enter amount for ${category}`}
-              value={budget[category as keyof Budget]}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2 mt-1"
-              min="0"
-              required
-            />
-          </div>
-        ))}
+    <form onSubmit={handleSubmit} className="bg-white border border-[#29AB87] rounded-xl p-6 shadow-md">
+      <h2 className="text-xl font-bold text-[#1D7E5F] mb-4">Set Your Monthly Budget</h2>
 
-        <div>
-          <label htmlFor="otherAmount" className="block font-medium">Other ($):</label>
-          <input
-            id="otherAmount"
-            type="number"
-            name="otherAmount"
-            placeholder="E.g., $50"
-            value={budget.otherAmount}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-            min="0"
-          />
-        </div>
+      <label className="block text-[#1D7E5F] font-semibold mb-2">
+        Total Budget Amount ($)
+      </label>
+      <input
+        type="number"
+        value={amount}
+        onChange={(e) => setAmount(parseFloat(e.target.value))}
+        className="w-full border border-[#29AB87] rounded px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#29AB87]"
+      />
 
-        <div>
-          <label htmlFor="otherNote" className="block font-medium">Note for Other:</label>
-          <input
-            id="otherNote"
-            type="text"
-            name="otherNote"
-            placeholder="E.g., gifts, pet care..."
-            value={budget.otherNote}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
-        >
-          {loading ? 'Saving...' : 'Save Budget'}
-        </button>
-
-        {error && <p className="text-red-600 text-sm mt-2">Error: {error.message}</p>}
-      </form>
-    </div>
+      <button
+        type="submit"
+        className="bg-[#29AB87] hover:bg-[#218F71] text-white font-bold py-2 px-4 rounded-full transition"
+      >
+        Save Budget
+      </button>
+    </form>
   );
 };
 

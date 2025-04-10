@@ -25,6 +25,9 @@ const ProfilePage = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editNotes, setEditNotes] = useState("");
 
+  // ✅ Accordion toggle state
+  const [showAccordion, setShowAccordion] = useState(false);
+
   const handleCreateProject = async () => {
     try {
       const { data } = await createProject({
@@ -71,9 +74,7 @@ const ProfilePage = () => {
   };  
 
   return (
-    <div
-      className="min-h-screen bg-money-bg bg-cover bg-center relative flex flex-col items-center px-4 py-6"
-    >
+    <div className="min-h-screen bg-money-bg bg-cover bg-center relative flex flex-col items-center px-4 py-6">
       {/* Background Blur Layer */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0" />
 
@@ -90,8 +91,22 @@ const ProfilePage = () => {
         <h1 className="text-3xl font-bold text-[#1D7E5F] mb-2">Profile</h1>
         <p className="text-lg text-[#1D7E5F] font-medium mb-6">✨ Hey there, RockStar!</p>
 
-        {/* Profile Details */}
-        <ProfileForm />
+        {/* ✅ Accordion for Edit User Info */}
+        <div className="border border-[#29AB87] rounded-lg overflow-hidden shadow mb-6">
+          <button
+            onClick={() => setShowAccordion(!showAccordion)}
+            className="w-full text-left px-4 py-3 bg-[#29AB87] text-white font-semibold flex justify-between items-center hover:bg-[#218F71] transition"
+          >
+            📝 Edit User Info
+            <span>{showAccordion ? '▲' : '▼'}</span>
+          </button>
+
+          {showAccordion && (
+            <div className="p-4 bg-white">
+              <ProfileForm />
+            </div>
+          )}
+        </div>
 
         {/* Future Enhancements Placeholder */}
         <div className="mt-8 space-y-4">
@@ -103,60 +118,59 @@ const ProfilePage = () => {
           <div>
             <h2 className="text-[#1D7E5F] font-semibold">📁 Projects</h2>
 
-              {loading && <p className="text-gray-700">Loading your projects...</p>}
-              {error && <p className="text-red-500">Error fetching projects 😢</p>}
+            {loading && <p className="text-gray-700">Loading your projects...</p>}
+            {error && <p className="text-red-500">Error fetching projects 😢</p>}
+            {!loading && projects.length === 0 && (
+              <p className="text-gray-700">No active projects yet.</p>
+            )}
 
-              {!loading && projects.length === 0 && (
-                <p className="text-gray-700">No active projects yet.</p>
-              )}
-
-              {projects.length < 3 && (
-                <button
-                  onClick={handleCreateProject}
-                  className="mb-4 bg-[#29AB87] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#218F71]"
-                >
-                  ➕ New Project
-                </button>
-              )}
+            {projects.length < 3 && (
+              <button
+                onClick={handleCreateProject}
+                className="mb-4 bg-[#29AB87] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#218F71]"
+              >
+                ➕ New Project
+              </button>
+            )}
 
             <ul className="mt-2 space-y-2">
               {projects.map((project: ProjectSummary) => (
                 <li
-                key={project.id}
-                className="flex justify-between items-center px-4 py-3 rounded-lg bg-white shadow border border-[#29AB87]"
-              >
-                <div
-                  className="cursor-pointer flex-1"
-                  onClick={() => navigate(`/project/${project.id}`)}
+                  key={project.id}
+                  className="flex justify-between items-center px-4 py-3 rounded-lg bg-white shadow border border-[#29AB87]"
                 >
-                  <div className="text-lg font-semibold text-[#1D7E5F]">{project.title}</div>
-                  <div className="text-sm text-gray-500">
-                    Created: {new Date(project.createdAt).toLocaleString()}
+                  <div
+                    className="cursor-pointer flex-1"
+                    onClick={() => navigate(`/project/${project.id}`)}
+                  >
+                    <div className="text-lg font-semibold text-[#1D7E5F]">{project.title}</div>
+                    <div className="text-sm text-gray-500">
+                      Created: {new Date(project.createdAt).toLocaleString()}
+                    </div>
                   </div>
-                </div>
-              
-                <div className="flex items-center space-x-2 ml-4">
-                  <button
-                    onClick={() => {
-                      setEditingProject(project);
-                      setEditTitle(project.title);
-                      setEditNotes(project.notes || "");
-                    }}
-                    className="text-blue-600 hover:text-blue-800 font-bold"
-                    title="Edit project"
-                  >
-                    ✏️
-                  </button>
-              
-                  <button
-                    onClick={() => handleDelete(project.id)}
-                    className="text-red-600 hover:text-red-800 font-bold"
-                    title="Delete project"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </li>              
+
+                  <div className="flex items-center space-x-2 ml-4">
+                    <button
+                      onClick={() => {
+                        setEditingProject(project);
+                        setEditTitle(project.title);
+                        setEditNotes(project.notes || "");
+                      }}
+                      className="text-blue-600 hover:text-blue-800 font-bold"
+                      title="Edit project"
+                    >
+                      ✏️
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(project.id)}
+                      className="text-red-600 hover:text-red-800 font-bold"
+                      title="Delete project"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </li>
               ))}
             </ul>
 
@@ -199,7 +213,6 @@ const ProfilePage = () => {
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </div>
