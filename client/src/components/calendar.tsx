@@ -19,6 +19,7 @@ interface CalendarProps {
     amount: number;
     note?: string;
   }[];
+   monthlyBudget: number; 
 }
 
 const Calendar = ({ 
@@ -28,7 +29,8 @@ const Calendar = ({
   stressEntries,
   setEntries,
   saveCalendarData,
-  budgetData, }: CalendarProps) => {
+  budgetData, 
+  monthlyBudget}: CalendarProps) => {
 
   const fullCalendarRef = useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] = React.useState<'dayGridDay' | 'dayGridWeek' | 'dayGridMonth'>('dayGridDay');
@@ -96,6 +98,7 @@ const Calendar = ({
             setEntries={setEntries}
             saveCalendarData={saveCalendarData}
             budgetData={budgetData}
+            monthlyBudget={monthlyBudget}
           />
         </>
       ) : (

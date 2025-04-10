@@ -17,6 +17,7 @@ interface TodaySummaryProps {
     amount: number;
     note?: string;
   }[];
+  monthlyBudget: number; // ✅ FIXED!
 }
 
 const TodaySummary = ({ 
@@ -27,7 +28,9 @@ const TodaySummary = ({
   stressLevel,
   setEntries,
   saveCalendarData,
-  budgetData, }: TodaySummaryProps) => {
+  budgetData,
+  monthlyBudget,
+}: TodaySummaryProps) => {
 
   const [showDetails, setShowDetails] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
@@ -40,20 +43,26 @@ const TodaySummary = ({
   
   const seen = new Set<string>();
   const dedupedIncome = incomeEntriesThisMonth.filter((e) => {
-    const key = `${e.note}-${e.amount}-${e.category}`; // Note-based uniqueness
+    const key = `${e.note}-${e.amount}-${e.category}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
   
   const monthlyIncome = dedupedIncome.reduce((sum, e) => sum + e.amount, 0);
-  useEffect(() => {
-    console.log('✅ Deduped Income Entries:', dedupedIncome);
-  }, [dedupedIncome]);  
 
   const monthlyExpenses = entries
     .filter((e) => e.type === 'expense' && e.date?.startsWith(selectedMonth))
     .reduce((sum, e) => sum + e.amount, 0);
+
+  // ✅ Color Logic
+  const budgetPercentage = monthlyBudget > 0 ? (monthlyExpenses / monthlyBudget) * 100 : 0;
+  let budgetColor = '#C8E6C9'; // soft green
+  if (budgetPercentage >= 95) {
+    budgetColor = '#E53935'; // red
+  } else if (budgetPercentage >= 75) {
+    budgetColor = '#FFB300'; // yellow
+  }
 
   const formatTitle = (str: string) =>
     str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -90,7 +99,6 @@ const TodaySummary = ({
   
     setEntries(updated);
   
-    // Rebuild calendarData to send to backend
     const calendarMap: { [date: string]: Entry[] } = {};
     updated.forEach((e) => {
       calendarMap[e.date!] = [...(calendarMap[e.date!] || []), e];
@@ -103,8 +111,6 @@ const TodaySummary = ({
       }))
     );
     await saveCalendarData(calendarData);
-    console.log("🧼 Final calendarData to send:", JSON.stringify(calendarData, null, 2));
-
   };
 
   return (
@@ -122,10 +128,21 @@ const TodaySummary = ({
           <p className="text-[#1D7E5F] font-semibold text-xl">🧠 Stress Level: {stressLevel}</p>
         )}
 
-      <div className="mt-4 border-t pt-4 border-[#29AB87]">
-        <p className="text-[#1D7E5F] font-semibold">📊 Monthly Income: ${monthlyIncome.toFixed(2)}</p>
-        <p className="text-[#1D7E5F] font-semibold">📉 Monthly Expenses: ${monthlyExpenses.toFixed(2)}</p>
-      </div>
+        <div className="mt-4 border-t pt-4 border-[#29AB87]">
+          <p className="text-[#1D7E5F] font-semibold">📊 Monthly Income: ${monthlyIncome.toFixed(2)}</p>
+          <p
+            className="font-semibold"
+            style={{
+              color: '#1D7E5F',
+              backgroundColor: monthlyBudget === 0 ? 'transparent' : budgetColor,
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+            }}
+          >
+            📉 Monthly Expenses: ${monthlyExpenses.toFixed(2)}
+            {monthlyBudget > 0 && ` (of $${monthlyBudget.toFixed(2)})`}
+          </p>
+        </div>
 
         <button
           onClick={() => setShowDetails(!showDetails)}
@@ -191,21 +208,6 @@ const TodaySummary = ({
                   ))}
               </ul>
             </div>
-
-            {budgetData && (
-              <div className="mt-4 border-t pt-4 border-[#29AB87]">
-                <h4 className="text-[#1D7E5F] font-semibold mb-2">🧾 Monthly Budget Breakdown:</h4>
-                <ul className="list-disc list-inside text-sm text-[#1D7E5F]">
-                  {budgetData.map((b, idx) => (
-                    <li key={idx}>
-                      {b.category}: ${b.amount.toFixed(2)}
-                      {b.note && ` - ${b.note}`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
           </div>
         )}
       </div>
