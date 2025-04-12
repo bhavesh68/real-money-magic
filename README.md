@@ -162,10 +162,7 @@ real-money-magic/
 
 ## 🌐 Deployment
 
-- **Frontend**: [coming soon]
-- **Backend**: [coming soon]
-
-> Add deployment URLs here once Render setup is complete.
+https://realmoneymagicfrontend.onrender.com
 
 ---
 
